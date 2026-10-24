@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-white text-slate-900 font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    text-rendering: optimizeLegibility;
+  }
+}
+
+:root {
+  --page-gutter: clamp(16px, 2.5vw, 44px);
+  --section-gap: clamp(24px, 3.5vw, 48px);
+  --header-height: 72px;
+}
+
+@layer utilities {
+  /* Professional responsive layout container matching boAt layout density */
+  .cb-container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;    /* 16px (320px–479px) */
+    padding-right: 1rem;
+    max-width: 1680px;    /* Efficient desktop utilization matching reference */
+  }
+  @media (min-width: 480px) {
+    .cb-container {
+      padding-left: 1.125rem; /* 18px (480px–767px) */
+      padding-right: 1.125rem;
+    }
+  }
+  @media (min-width: 768px) {
+    .cb-container {
+      padding-left: 1.375rem; /* 22px (768px–1023px) */
+      padding-right: 1.375rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .cb-container {
+      padding-left: 1.75rem;  /* 28px (1024px–1439px) */
+      padding-right: 1.75rem;
+    }
+  }
+  @media (min-width: 1440px) {
+    .cb-container {
+      padding-left: 2.25rem;  /* 36px (1440px–1919px) */
+      padding-right: 2.25rem;
+    }
+  }
+  @media (min-width: 1920px) {
+    .cb-container {
+      padding-left: 2.75rem;  /* 44px (1920px+) */
+      padding-right: 2.75rem;
+    }
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}
+
+/* Custom ChhotaBhai clean light luxury scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.cb-glass {
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.cb-gradient-red {
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+}
