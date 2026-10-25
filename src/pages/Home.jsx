@@ -161,7 +161,7 @@ export const Home = () => {
   const adminCrazyDeals = products.filter((p) => p.isCrazyDeal);
   const crazyDeals =
     adminCrazyDeals.length > 0
-      ? adminCrazyDeals.slice(0, 8)
+      ? adminCrazyDeals.slice(0, 18)
       : [...products]
           .sort((a, b) => {
             const aIdx = screenshotOrder.indexOf((a.title || '').toLowerCase());
@@ -171,7 +171,7 @@ export const Home = () => {
             if (bIdx !== -1) return 1;
             return 0;
           })
-          .slice(0, 6);
+          .slice(0, 18);
 
   const displayDeals = crazyDeals;
 

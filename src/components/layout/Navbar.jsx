@@ -30,6 +30,8 @@ export const Navbar = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = useRef(null);
+  const userDropdownRef = useRef(null);
+
 
   const { user, isAuthenticated, logout } = useAuthStore();
   const { totalItems, openDrawer, fetchCart } = useCartStore();
@@ -82,16 +84,20 @@ export const Navbar = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Close search auto-suggest when clicking outside
+  // Close search auto-suggest and user dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (searchRef.current && !searchRef.current.contains(e.target)) {
         setShowSuggestions(false);
       }
+      if (userDropdownRef.current && !userDropdownRef.current.contains(e.target)) {
+        setUserDropdown(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -288,62 +294,97 @@ export const Navbar = () => {
             </div>
 
             {/* User Account Action */}
-            <div className="relative">
+            <div ref={userDropdownRef} className="relative">
               {isAuthenticated ? (
                 <div className="relative">
                   <button
                     onClick={() => setUserDropdown(!userDropdown)}
-                    className="p-2 hover:bg-slate-100 rounded-full transition text-slate-800 flex items-center justify-center relative cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-300"
+                    className="flex items-center gap-2 p-1 pl-1 pr-2 hover:bg-slate-100 rounded-full transition text-slate-800 cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-300 border border-slate-200/80"
                     title="Account Profile"
                     aria-label="User Account"
                   >
-                    <UserIcon className="w-[21px] h-[21px] text-slate-800" strokeWidth={1.75} />
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white" />
+                    {user?.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user?.name || 'User Profile'}
+                        referrerPolicy="no-referrer"
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-2 ring-emerald-500/80 shadow-2xs"
+                      />
+                    ) : (
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center shadow-2xs">
+                        {user?.name ? user.name.charAt(0).toUpperCase() : <UserIcon className="w-4 h-4" />}
+                      </div>
+                    )}
+                    <span className="hidden md:inline-block text-xs font-bold text-slate-800 max-w-[100px] truncate">
+                      {user?.name?.split(' ')[0] || 'Account'}
+                    </span>
+                    <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${userDropdown ? 'rotate-180' : ''}`} />
                   </button>
 
                   {userDropdown && (
-                    <div className="absolute right-0 top-12 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in duration-150">
-                      <div className="px-4 py-2 border-b border-slate-100">
-                        <p className="text-xs font-bold text-slate-900 truncate">{user?.name}</p>
-                        <p className="text-[10px] text-slate-400 truncate">{user?.email}</p>
+                    <div className="absolute right-0 top-12 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in duration-150">
+                      <div className="px-4 py-3 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
+                        {user?.avatar ? (
+                          <img
+                            src={user.avatar}
+                            alt={user.name}
+                            referrerPolicy="no-referrer"
+                            className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-200 shrink-0"
+                          />
+                        ) : (
+                          <div className="w-9 h-9 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center shrink-0">
+                            {user?.name ? user.name.charAt(0).toUpperCase() : <UserIcon className="w-4 h-4" />}
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-bold text-slate-900 truncate">{user?.name}</p>
+                          <p className="text-[10px] text-slate-400 truncate">{user?.email}</p>
+                        </div>
                       </div>
-                      <Link
-                        to="/my-orders"
-                        onClick={() => setUserDropdown(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50"
-                      >
-                        <Package className="w-4 h-4 text-slate-500" /> My Orders
-                      </Link>
-                      {user?.role === 'admin' && (
+
+                      <div className="py-1">
                         <Link
-                          to="/admin"
+                          to="/my-orders"
                           onClick={() => setUserDropdown(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-[#e11938] hover:bg-rose-50"
+                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:text-[#e11938] hover:bg-slate-50 transition"
                         >
-                          <Shield className="w-4 h-4" /> Admin Console
+                          <Package className="w-4 h-4 text-slate-500" /> My Orders
                         </Link>
-                      )}
-                      <button
-                        onClick={() => {
-                          logout();
-                          setUserDropdown(false);
-                          navigate('/');
-                        }}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 text-left border-t border-slate-100 mt-1 cursor-pointer"
-                      >
-                        <LogOut className="w-4 h-4" /> Log Out
-                      </button>
+                        {user?.role === 'admin' && (
+                          <Link
+                            to="/admin"
+                            onClick={() => setUserDropdown(false)}
+                            className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-[#e11938] hover:bg-rose-50 transition"
+                          >
+                            <Shield className="w-4 h-4" /> Admin Console
+                          </Link>
+                        )}
+                      </div>
+
+                      <div className="border-t border-slate-100 pt-1">
+                        <button
+                          onClick={() => {
+                            logout();
+                            setUserDropdown(false);
+                            navigate('/');
+                          }}
+                          className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 text-left cursor-pointer transition"
+                        >
+                          <LogOut className="w-4 h-4" /> Log Out
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
               ) : (
                 <Link
                   to="/login"
-                  className="p-2 hover:bg-slate-100 rounded-full transition text-slate-800 flex items-center justify-center relative focus:outline-none focus:ring-2 focus:ring-slate-300"
+                  className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-slate-100 rounded-full transition text-slate-800 text-xs font-bold border border-slate-200/80 focus:outline-none focus:ring-2 focus:ring-slate-300"
                   title="Sign In"
                   aria-label="Sign In"
                 >
-                  <UserIcon className="w-[21px] h-[21px] text-slate-800" strokeWidth={1.75} />
+                  <UserIcon className="w-4 h-4 text-slate-700" strokeWidth={2} />
+                  <span className="hidden sm:inline">Sign In</span>
                 </Link>
               )}
             </div>
@@ -377,6 +418,48 @@ export const Navbar = () => {
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-slate-200 bg-white px-4 py-5 space-y-4 shadow-xl">
+          {/* Mobile User Profile Header */}
+          {isAuthenticated ? (
+            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2.5 min-w-0">
+                {user?.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    referrerPolicy="no-referrer"
+                    className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-200 shrink-0"
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center shrink-0">
+                    {user?.name ? user.name.charAt(0).toUpperCase() : <UserIcon className="w-4 h-4" />}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-slate-900 truncate">{user?.name}</p>
+                  <p className="text-[10px] text-slate-500 truncate">{user?.email}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  logout();
+                  setMobileMenuOpen(false);
+                  navigate('/');
+                }}
+                className="px-3 py-1.5 text-[11px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition shrink-0 cursor-pointer"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-900 text-white text-xs font-bold rounded-xl"
+            >
+              <UserIcon className="w-4 h-4" /> Sign In / Register
+            </Link>
+          )}
+
           {/* Mobile Search */}
           <form onSubmit={handleSearchSubmit} className="relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -416,6 +499,13 @@ export const Navbar = () => {
             >
               <Sparkles className="w-4 h-4 text-[#e11938]" /> ChhotaBhai Personalisation
             </button>
+            <Link
+              to="/my-orders"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-800 hover:bg-slate-50 rounded-xl"
+            >
+              <Package className="w-4 h-4 text-[#e11938]" /> My Orders
+            </Link>
             <Link
               to="/track"
               onClick={() => setMobileMenuOpen(false)}

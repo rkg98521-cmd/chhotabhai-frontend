@@ -4,6 +4,7 @@ import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import CartDrawer from '../components/cart/CartDrawer';
 import DeviceSelectorModal from '../components/common/DeviceSelectorModal';
+import MobileBottomNav from '../components/layout/MobileBottomNav';
 
 export const MainLayout = () => {
   return (
@@ -11,10 +12,11 @@ export const MainLayout = () => {
       <Navbar />
       <CartDrawer />
       <DeviceSelectorModal />
-      <main className="flex-1 bg-white">
+      <main className="flex-1 bg-white pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
         <Outlet />
       </main>
       <Footer />
+      <MobileBottomNav />
     </div>
   );
 };

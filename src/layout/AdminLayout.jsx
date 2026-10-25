@@ -15,26 +15,49 @@ import {
 import { useAuthStore } from '../store/useStore';
 
 export const AdminLayout = () => {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout, fetchMe } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [checking, setChecking] = useState(!user || user.role !== 'admin');
 
-  // Route Guard: Admin Role Check
+  // Route Guard: Admin Role Check with Fresh Sync
   useEffect(() => {
+    let isMounted = true;
+
     if (!isAuthenticated) {
       navigate('/login?redirect=/admin');
-    } else if (user?.role !== 'admin') {
-      navigate('/');
+      return;
     }
-  }, [isAuthenticated, user, navigate]);
+
+    if (user?.role === 'admin') {
+      setChecking(false);
+      return;
+    }
+
+    // Attempt to sync fresh user role from backend before redirecting
+    fetchMe().then((freshUser) => {
+      if (!isMounted) return;
+      if (freshUser?.role !== 'admin') {
+        navigate('/');
+      } else {
+        setChecking(false);
+      }
+    }).catch(() => {
+      if (isMounted) navigate('/');
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAuthenticated, user?.role, navigate, fetchMe]);
 
   // Close mobile drawer on route navigation
   useEffect(() => {
     setMobileSidebarOpen(false);
   }, [location.pathname]);
 
-  if (!isAuthenticated || user?.role !== 'admin') {
+  if (!isAuthenticated || checking || user?.role !== 'admin') {
     return null;
   }
 

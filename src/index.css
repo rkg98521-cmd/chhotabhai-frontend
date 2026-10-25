@@ -101,3 +101,13 @@
 .cb-gradient-red {
   background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
 }
+
+/* Mobile Safe-Area padding helpers for iOS swipe bar & Android gestures */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-bottom-margin {
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+

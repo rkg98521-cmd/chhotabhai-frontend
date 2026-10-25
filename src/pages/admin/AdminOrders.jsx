@@ -1,916 +1,247 @@
-import React, { useEffect, useState } from 'react';
-import {
-  ShoppingBag,
-  Search,
-  Filter,
-  Eye,
-  Truck,
-  CheckCircle2,
-  Clock,
-  AlertCircle,
-  X,
-  ExternalLink,
-  ChevronRight,
-  ShieldCheck,
-  RefreshCw,
-  Send,
-  MapPin,
-  CreditCard,
-  User,
-  Calendar,
-  Layers,
-  Copy,
-  CheckCheck,
-  MessageCircle,
-  Zap,
-} from 'lucide-react';
+/**
+ * @file AdminOrders.jsx
+ * @description Enterprise Order Management System (OMS) Page.
+ * Orchestrates AdminOrdersList and AdminOrderDetail with Optimistic UI updates
+ * and auto-dismissing toast feedback.
+ */
+
+import React, { useState, useEffect, useCallback } from 'react';
 import axiosInstance from '../../api/axiosInstance';
-import Loader from '../../components/Loader';
-import { generateTrackingUrl } from '../../utils/trackingHelper';
-
-const STATUS_OPTIONS = [
-  'PLACED',
-  'CONFIRMED',
-  'PROCESSING',
-  'SHIPPED',
-  'OUT_FOR_DELIVERY',
-  'DELIVERED',
-  'CANCELLED',
-];
-
-const MEESHO_COURIERS = [
-  'Delhivery',
-  'Shadowfax',
-  'Xpressbees',
-  'Ekart',
-  'BlueDart',
-  'DTDC',
-  'Other',
-];
+import { AdminOrdersList } from '../../components/admin/AdminOrdersList';
+import { AdminOrderDetail } from '../../components/admin/AdminOrderDetail';
+import { CheckCircle2, AlertCircle, X } from 'lucide-react';
 
 export const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('ALL');
+  const [actionLoading, setActionLoading] = useState(false);
+
+  // Filters & Pagination State
+  const [activeStatus, setActiveStatus] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Inspection / Dispatch Modal State
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [updateLoading, setUpdateLoading] = useState(false);
-  const [modalFeedback, setModalFeedback] = useState({ type: '', message: '' });
-
-  // Meesho Dropshipping Fulfillment Box State
-  const [addressCopied, setAddressCopied] = useState(false);
-  const [meeshoCourier, setMeeshoCourier] = useState('Delhivery');
-  const [meeshoAwb, setMeeshoAwb] = useState('');
-  const [meeshoLoading, setMeeshoLoading] = useState(false);
-
-  // Status & Tracking Update Form State
-  const [statusForm, setStatusForm] = useState({
-    status: '',
-    comment: '',
-    courierCompany: '',
-    trackingNumber: '',
-    trackingUrl: '',
+  const [paymentFilter, setPaymentFilter] = useState('ALL');
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalOrders: 0,
+    limit: 10,
+    hasNextPage: false,
+    hasPrevPage: false,
   });
+  const [statusCounts, setStatusCounts] = useState({});
 
-  const fetchOrders = async () => {
+  // Selected Order for Inspection Modal
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+
+  // Toast Notification State
+  const [toast, setToast] = useState(null); // { type: 'success' | 'error', message: string }
+
+  const showToast = (type, message) => {
+    setToast({ type, message });
+    setTimeout(() => {
+      setToast(null);
+    }, 4500);
+  };
+
+  const fetchOrders = useCallback(async (page = 1) => {
     setLoading(true);
     try {
-      const res = await axiosInstance.get('/admin/orders');
-      setOrders(res.data.data || []);
+      const params = new URLSearchParams({
+        page,
+        limit: 10,
+      });
+
+      if (activeStatus && activeStatus !== 'ALL') {
+        params.append('status', activeStatus);
+      }
+      if (paymentFilter && paymentFilter !== 'ALL') {
+        params.append('paymentStatus', paymentFilter);
+      }
+      if (searchQuery.trim()) {
+        params.append('search', searchQuery.trim());
+      }
+
+      const res = await axiosInstance.get(`/admin/orders?${params.toString()}`);
+      const data = res.data.data;
+
+      setOrders(data.orders || []);
+      setPagination(data.pagination || {});
+      setStatusCounts(data.counts || {});
     } catch (err) {
-      console.error('Failed to fetch admin orders:', err);
+      console.error('Failed to load admin orders:', err);
+      showToast('error', err.response?.data?.message || err.message || 'Failed to fetch orders.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeStatus, paymentFilter, searchQuery]);
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    const timer = setTimeout(() => {
+      fetchOrders(1);
+    }, 300); // Debounce search
+    return () => clearTimeout(timer);
+  }, [fetchOrders]);
 
-  const openOrderModal = (order) => {
-    setSelectedOrder(order);
-    setStatusForm({
-      status: order.orderStatus || 'PLACED',
-      comment: '',
-      courierCompany: order.trackingDetails?.courierCompany || 'Delhivery',
-      trackingNumber: order.trackingDetails?.trackingNumber || '',
-      trackingUrl: order.trackingDetails?.trackingUrl || '',
+  /**
+   * Optimistic UI Order Fulfillment Status Updater
+   */
+  const handleUpdateStatus = async ({ orderId, status, courierCompany, trackingNumber, trackingUrl, comment }) => {
+    setActionLoading(true);
+
+    // Save snapshot for rollback if API rejects
+    const previousOrders = [...orders];
+    const previousSelectedOrder = selectedOrder ? { ...selectedOrder } : null;
+
+    // 1. Optimistic local mutation
+    const optimisticUpdatedOrders = orders.map((ord) => {
+      if (ord._id === orderId) {
+        return {
+          ...ord,
+          orderStatus: status,
+          trackingDetails: {
+            ...ord.trackingDetails,
+            courierCompany: courierCompany || ord.trackingDetails?.courierCompany,
+            trackingNumber: trackingNumber || ord.trackingDetails?.trackingNumber,
+            trackingUrl: trackingUrl || ord.trackingDetails?.trackingUrl,
+          },
+        };
+      }
+      return ord;
     });
 
-    setMeeshoCourier(order.trackingDetails?.courierCompany || 'Delhivery');
-    setMeeshoAwb(order.trackingDetails?.trackingNumber || '');
-    setModalFeedback({ type: '', message: '' });
-    setAddressCopied(false);
-    setIsModalOpen(true);
-  };
-
-  const handleCopyAddress = (order) => {
-    if (!order || !order.shippingAddress) return;
-    const addr = order.shippingAddress;
-    const formatted = [
-      `Name: ${addr.fullName || order.user?.name || ''}`,
-      `Phone: ${addr.phone || order.user?.phone || ''}`,
-      `Address: ${addr.street || ''}${addr.landmark ? `, Near ${addr.landmark}` : ''}, ${addr.city || ''}, ${addr.state || ''} - ${addr.pincode || addr.postalCode || ''}`,
-    ].join('\n');
-
-    navigator.clipboard.writeText(formatted);
-    setAddressCopied(true);
-    setTimeout(() => setAddressCopied(false), 2500);
-  };
-
-  const handleMeeshoFulfill = async (e) => {
-    e.preventDefault();
-    if (!selectedOrder) return;
-    if (!meeshoAwb.trim()) {
-      setModalFeedback({
-        type: 'error',
-        message: 'Please enter the AWB / Tracking Number generated by Meesho.',
-      });
-      return;
+    setOrders(optimisticUpdatedOrders);
+    if (selectedOrder && selectedOrder._id === orderId) {
+      setSelectedOrder((prev) => ({
+        ...prev,
+        orderStatus: status,
+        trackingDetails: {
+          ...prev.trackingDetails,
+          courierCompany: courierCompany || prev.trackingDetails?.courierCompany,
+          trackingNumber: trackingNumber || prev.trackingDetails?.trackingNumber,
+          trackingUrl: trackingUrl || prev.trackingDetails?.trackingUrl,
+        },
+      }));
     }
-
-    setMeeshoLoading(true);
-    setModalFeedback({ type: '', message: '' });
 
     try {
-      const payload = {
-        courierName: meeshoCourier,
-        awbNumber: meeshoAwb.trim(),
-        status: 'SHIPPED',
-      };
-
-      const res = await axiosInstance.patch(`/admin/orders/${selectedOrder._id}/fulfill`, payload);
-      const updated = res.data.data;
-
-      setModalFeedback({
-        type: 'success',
-        message: `Order #${updated.orderNumber} successfully marked as SHIPPED with ${updated.trackingDetails.courierCompany} (AWB: ${updated.trackingDetails.trackingNumber})!`,
+      // 2. Perform authoritative API request
+      const res = await axiosInstance.patch(`/admin/orders/${orderId}/status`, {
+        status,
+        courierCompany,
+        trackingNumber,
+        trackingUrl,
+        comment,
       });
 
-      setSelectedOrder(updated);
-      setOrders((prev) =>
-        prev.map((o) => (o._id === updated._id ? { ...o, ...updated } : o))
-      );
+      const updatedOrder = res.data.data;
+
+      // 3. Confirm with server response
+      setOrders((prev) => prev.map((o) => (o._id === orderId ? updatedOrder : o)));
+      if (selectedOrder && selectedOrder._id === orderId) {
+        setSelectedOrder(updatedOrder);
+      }
+
+      showToast('success', `Order #${updatedOrder.orderNumber} transitioned to ${status} successfully.`);
     } catch (err) {
-      console.error('Fulfillment error:', err);
-      setModalFeedback({
-        type: 'error',
-        message: err.response?.data?.message || 'Failed to fulfill order. Please check input parameters.',
-      });
+      // 4. Rollback on failure (e.g. Invalid state machine jump or inventory failure)
+      setOrders(previousOrders);
+      if (previousSelectedOrder) setSelectedOrder(previousSelectedOrder);
+
+      const errorMsg =
+        err.response?.data?.message || err.message || 'State machine transition rejected by server.';
+      showToast('error', errorMsg);
     } finally {
-      setMeeshoLoading(false);
+      setActionLoading(false);
     }
   };
 
-  const handleUpdateOrderStatus = async (e) => {
-    e.preventDefault();
-    if (!selectedOrder) return;
+  const handleSelectOrder = async (order) => {
+    setSelectedOrder(order);
+    setIsDetailOpen(true);
 
-    setUpdateLoading(true);
-    setModalFeedback({ type: '', message: '' });
-
+    // Fetch authoritative order details with allowedNextStatuses
     try {
-      const payload = {
-        status: statusForm.status,
-        comment: statusForm.comment.trim() || `Status updated to ${statusForm.status} by Admin`,
-        courierCompany: statusForm.courierCompany.trim(),
-        trackingNumber: statusForm.trackingNumber.trim(),
-        trackingUrl: statusForm.trackingUrl.trim() || generateTrackingUrl(statusForm.courierCompany, statusForm.trackingNumber),
-      };
-
-      const res = await axiosInstance.patch(`/admin/orders/${selectedOrder._id}/status`, payload);
-      const updated = res.data.data;
-
-      setModalFeedback({
-        type: 'success',
-        message: `Order #${updated.orderNumber} successfully updated to ${updated.orderStatus}!`,
-      });
-
-      setSelectedOrder(updated);
-      setOrders((prev) =>
-        prev.map((o) => (o._id === updated._id ? { ...o, ...updated } : o))
-      );
-      setStatusForm((prev) => ({ ...prev, comment: '' }));
+      const res = await axiosInstance.get(`/admin/orders/${order._id}`);
+      setSelectedOrder(res.data.data);
     } catch (err) {
-      console.error('Order status update failed:', err);
-      setModalFeedback({
-        type: 'error',
-        message: err.response?.data?.message || 'Failed to update order status. Please verify permissions.',
-      });
-    } finally {
-      setUpdateLoading(false);
+      console.warn('Failed to fetch full order details:', err.message);
     }
   };
-
-  const getWhatsAppLink = (order) => {
-    if (!order) return '#';
-    const rawPhone = (order.shippingAddress?.phone || order.user?.phone || '').replace(/\D/g, '');
-    const phone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
-    const customerName = order.shippingAddress?.fullName || order.user?.name || 'Customer';
-    const courier = order.trackingDetails?.courierCompany || meeshoCourier || 'Courier Express';
-    const trackingUrl =
-      order.trackingDetails?.trackingUrl ||
-      generateTrackingUrl(courier, order.trackingDetails?.trackingNumber || meeshoAwb);
-
-    const message = `Hi ${customerName}, your ChhotaBhai order #${order.orderNumber} has been dispatched via ${courier}! Track here: ${trackingUrl}`;
-    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-  };
-
-  // Filter orders
-  const filteredOrders = orders.filter((o) => {
-    const matchesTab = activeTab === 'ALL' || o.orderStatus === activeTab;
-    const query = searchQuery.toLowerCase().trim();
-    const matchesSearch =
-      !query ||
-      o.orderNumber?.toLowerCase().includes(query) ||
-      o.user?.name?.toLowerCase().includes(query) ||
-      o.user?.email?.toLowerCase().includes(query) ||
-      o.shippingAddress?.fullName?.toLowerCase().includes(query) ||
-      o.shippingAddress?.phone?.includes(query);
-
-    return matchesTab && matchesSearch;
-  });
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'DELIVERED':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-      case 'SHIPPED':
-      case 'OUT_FOR_DELIVERY':
-        return 'bg-blue-50 text-blue-700 border-blue-200';
-      case 'CONFIRMED':
-      case 'PROCESSING':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
-      case 'CANCELLED':
-        return 'bg-rose-50 text-rose-700 border-rose-200';
-      case 'PLACED':
-      default:
-        return 'bg-rose-50 text-rose-600 border-rose-200';
-    }
-  };
-
-  if (loading && orders.length === 0) {
-    return <Loader text="Loading Enterprise Orders Pipeline..." />;
-  }
 
   return (
-    <div className="space-y-6 w-full">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-50 text-rose-600 border border-rose-200">
-              Dropship & Fulfillment Command Center
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-tight mt-2 flex items-center gap-3">
-            <ShoppingBag className="w-8 h-8 text-rose-600" /> Orders Pipeline
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Meesho reseller dispatch flow, live courier AWB sync, and automated customer tracking.
-          </p>
-        </div>
-
-        <button
-          onClick={fetchOrders}
-          disabled={loading}
-          className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl transition border border-slate-200 shadow-sm self-start md:self-auto"
+    <div className="space-y-6">
+      {/* Toast Notification Container */}
+      {toast && (
+        <div
+          className={`fixed top-5 right-5 z-50 p-4 rounded-2xl shadow-xl border flex items-start gap-3 max-w-md animate-in slide-in-from-top-3 duration-200 ${
+            toast.type === 'success'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+              : 'bg-rose-50 border-rose-200 text-rose-900'
+          }`}
         >
-          <RefreshCw className={`w-3.5 h-3.5 text-rose-600 ${loading ? 'animate-spin' : ''}`} />
-          Sync Live Pipeline
-        </button>
-      </div>
-
-      {/* Filter Tabs & Search Bar */}
-      <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-        {/* Status Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-          {['ALL', ...STATUS_OPTIONS].map((status) => {
-            const count =
-              status === 'ALL'
-                ? orders.length
-                : orders.filter((o) => o.orderStatus === status).length;
-            const isActive = activeTab === status;
-
-            return (
-              <button
-                key={status}
-                onClick={() => setActiveTab(status)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition whitespace-nowrap flex items-center gap-2 border ${
-                  isActive
-                    ? 'bg-rose-600 text-white border-rose-600 shadow-sm shadow-rose-600/20'
-                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900'
-                }`}
-              >
-                <span>{status.replace(/_/g, ' ')}</span>
-                <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${
-                    isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
-                  }`}
-                >
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Search Input */}
-        <div className="relative">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search by Order #, Customer Name, Email, or Phone..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-rose-500 transition-colors"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-xs font-bold"
-            >
-              Clear
-            </button>
+          {toast.type === 'success' ? (
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+          ) : (
+            <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
           )}
-        </div>
-      </div>
-
-      {/* Orders Table */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-        {filteredOrders.length === 0 ? (
-          <div className="text-center py-16 px-4">
-            <ShoppingBag className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-slate-900 uppercase">No Orders Found</h3>
-            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-              {searchQuery
-                ? `No orders matching "${searchQuery}" in the ${activeTab} view.`
-                : `There are currently no orders under status ${activeTab}.`}
-            </p>
+          <div className="flex-1 text-xs font-semibold leading-relaxed">
+            {toast.message}
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs min-w-[760px]">
-              <thead>
-                <tr className="border-b border-slate-100 bg-slate-50 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  <th className="py-4 px-5">Order # / Date</th>
-                  <th className="py-4 px-5">Customer Info</th>
-                  <th className="py-4 px-5">Items Preview</th>
-                  <th className="py-4 px-5">Amount & Payment</th>
-                  <th className="py-4 px-5">Pipeline Status</th>
-                  <th className="py-4 px-5">Courier & AWB</th>
-                  <th className="py-4 px-5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredOrders.map((order) => {
-                  const firstItem = order.items?.[0];
-                  const extraItemsCount = (order.items?.length || 0) - 1;
-
-                  return (
-                    <tr
-                      key={order._id}
-                      className="hover:bg-slate-50/80 transition group cursor-pointer"
-                      onClick={() => openOrderModal(order)}
-                    >
-                      {/* Order # and Date */}
-                      <td className="py-4 px-5">
-                        <div className="font-mono font-bold text-slate-900 group-hover:text-rose-600 transition">
-                          {order.orderNumber}
-                        </div>
-                        <div className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </div>
-                      </td>
-
-                      {/* Customer Info */}
-                      <td className="py-4 px-5">
-                        <div className="font-bold text-slate-900">
-                          {order.shippingAddress?.fullName || order.user?.name || 'Customer'}
-                        </div>
-                        <div className="text-[11px] text-slate-500 font-mono">
-                          {order.shippingAddress?.phone || order.user?.phone || 'No phone'}
-                        </div>
-                        <div className="text-[11px] text-slate-400 truncate max-w-[160px]">
-                          {order.user?.email || 'N/A'}
-                        </div>
-                      </td>
-
-                      {/* Items Preview */}
-                      <td className="py-4 px-5">
-                        {firstItem ? (
-                          <div className="flex items-center gap-3">
-                            <img
-                              src={firstItem.image}
-                              alt={firstItem.title}
-                              className="w-10 h-10 rounded-xl object-cover bg-slate-50 border border-slate-200 flex-shrink-0"
-                            />
-                            <div className="min-w-0">
-                              <p className="text-xs font-bold text-slate-900 truncate max-w-[170px]">
-                                {firstItem.title}
-                              </p>
-                              <p className="text-[11px] text-slate-500">
-                                {firstItem.colorName || 'Default'} × {firstItem.quantity}
-                                {extraItemsCount > 0 && (
-                                  <span className="text-rose-600 font-bold ml-1">
-                                    +{extraItemsCount} more
-                                  </span>
-                                )}
-                              </p>
-                            </div>
-                          </div>
-                        ) : (
-                          <span className="text-xs text-slate-400">No items</span>
-                        )}
-                      </td>
-
-                      {/* Amount & Payment */}
-                      <td className="py-4 px-5">
-                        <div className="font-black text-slate-900 font-mono text-sm">
-                          ₹{order.pricingSummary?.grandTotal?.toLocaleString('en-IN')}
-                        </div>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider bg-slate-100 text-slate-700">
-                            {order.paymentInfo?.method}
-                          </span>
-                          <span
-                            className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
-                              order.paymentInfo?.status === 'PAID'
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                : 'bg-amber-50 text-amber-700 border border-amber-200'
-                            }`}
-                          >
-                            {order.paymentInfo?.status}
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* Status */}
-                      <td className="py-4 px-5">
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusBadge(
-                            order.orderStatus
-                          )}`}
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
-                          {order.orderStatus.replace(/_/g, ' ')}
-                        </span>
-                      </td>
-
-                      {/* Courier & AWB */}
-                      <td className="py-4 px-5">
-                        {order.trackingDetails?.trackingNumber ? (
-                          <div className="space-y-0.5">
-                            <div className="text-xs font-bold text-slate-900 flex items-center gap-1">
-                              <Truck className="w-3 h-3 text-rose-600" />
-                              {order.trackingDetails.courierCompany || 'Dispatched'}
-                            </div>
-                            <div className="text-[11px] font-mono text-slate-500">
-                              {order.trackingDetails.trackingNumber}
-                            </div>
-                          </div>
-                        ) : (
-                          <span className="text-xs text-slate-400 italic">Unassigned</span>
-                        )}
-                      </td>
-
-                      {/* Actions */}
-                      <td className="py-4 px-5 text-right">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openOrderModal(order);
-                          }}
-                          className="px-3 py-1.5 bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-slate-200 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ml-auto"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          Inspect & Fulfill
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {/* Order Detail & Dropship Inspection Modal */}
-      {isModalOpen && selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white border border-slate-200 w-full max-w-4xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 space-y-6 my-auto max-h-[92vh] overflow-y-auto shadow-2xl relative">
-            {/* Modal Header */}
-            <div className="flex items-start justify-between pb-4 border-b border-slate-100">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    Order Inspection & Dropship Fulfillment
-                  </span>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusBadge(
-                      selectedOrder.orderStatus
-                    )}`}
-                  >
-                    {selectedOrder.orderStatus.replace(/_/g, ' ')}
-                  </span>
-                </div>
-                <h2 className="text-2xl font-black text-slate-900 font-mono mt-1">
-                  {selectedOrder.orderNumber}
-                </h2>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Placed on{' '}
-                  {new Date(selectedOrder.createdAt).toLocaleString('en-IN', {
-                    dateStyle: 'medium',
-                    timeStyle: 'short',
-                  })}
-                </p>
-              </div>
-
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 rounded-xl transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Feedback Alert */}
-            {modalFeedback.message && (
-              <div
-                className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-3 border ${
-                  modalFeedback.type === 'success'
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    : 'bg-rose-50 text-rose-700 border-rose-200'
-                }`}
-              >
-                {modalFeedback.type === 'success' ? (
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                ) : (
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                )}
-                <span>{modalFeedback.message}</span>
-              </div>
-            )}
-
-            {/* 2-Column Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Customer & Shipping Address with One-Click Copy */}
-              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    <MapPin className="w-4 h-4 text-rose-600" /> Shipping Destination
-                  </div>
-                  <button
-                    onClick={() => handleCopyAddress(selectedOrder)}
-                    className="flex items-center gap-1.5 px-3 py-1 bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 rounded-lg transition border border-slate-200 shadow-sm"
-                    title="Copy full address for Meesho order placement"
-                  >
-                    {addressCopied ? (
-                      <>
-                        <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
-                        <span className="text-emerald-600">Address Copied!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5 text-slate-400" />
-                        <span>Copy Address for Meesho</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                <div className="space-y-1 text-xs text-slate-600">
-                  <p className="font-bold text-slate-900 text-sm">
-                    {selectedOrder.shippingAddress?.fullName}
-                  </p>
-                  <p className="text-slate-500">
-                    Phone: <span className="font-mono text-slate-900">{selectedOrder.shippingAddress?.phone}</span>
-                  </p>
-                  <p className="text-slate-500">
-                    Email: <span className="text-slate-900">{selectedOrder.user?.email || 'N/A'}</span>
-                  </p>
-                  <div className="pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-200 mt-2">
-                    <p>{selectedOrder.shippingAddress?.street}</p>
-                    {selectedOrder.shippingAddress?.landmark && (
-                      <p className="text-slate-400">Near {selectedOrder.shippingAddress.landmark}</p>
-                    )}
-                    <p>
-                      {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.state} -{' '}
-                      <span className="font-mono font-bold text-slate-900">
-                        {selectedOrder.shippingAddress?.pincode}
-                      </span>
-                    </p>
-                    <p className="text-slate-400">{selectedOrder.shippingAddress?.country || 'India'}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment & Financial Breakdown */}
-              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  <CreditCard className="w-4 h-4 text-rose-600" /> Financial Summary
-                </div>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between text-slate-500">
-                    <span>Subtotal:</span>
-                    <span className="font-mono text-slate-900 font-semibold">
-                      ₹{selectedOrder.pricingSummary?.subtotal?.toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-emerald-600">
-                    <span>Coupon Discount:</span>
-                    <span className="font-mono font-semibold">
-                      -₹{selectedOrder.pricingSummary?.discountAmount?.toLocaleString('en-IN') || 0}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-slate-500">
-                    <span>Shipping Charges:</span>
-                    <span className="font-mono text-slate-900 font-semibold">
-                      {selectedOrder.pricingSummary?.shippingFee === 0
-                        ? 'FREE'
-                        : `₹${selectedOrder.pricingSummary?.shippingFee}`}
-                    </span>
-                  </div>
-                  <div className="flex justify-between pt-2 border-t border-slate-200 text-sm font-black text-slate-900">
-                    <span>Grand Total:</span>
-                    <span className="font-mono text-rose-600 text-base">
-                      ₹{selectedOrder.pricingSummary?.grandTotal?.toLocaleString('en-IN')}
-                    </span>
-                  </div>
-
-                  <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-[11px]">
-                    <span className="text-slate-500">Payment:</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="px-2 py-0.5 rounded font-bold bg-white border border-slate-200 text-slate-800 uppercase">
-                        {selectedOrder.paymentInfo?.method}
-                      </span>
-                      <span
-                        className={`px-2 py-0.5 rounded font-bold uppercase ${
-                          selectedOrder.paymentInfo?.status === 'PAID'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-amber-50 text-amber-700 border border-amber-200'
-                        }`}
-                      >
-                        {selectedOrder.paymentInfo?.status}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Order Items Table */}
-            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5 space-y-3">
-              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                <Layers className="w-4 h-4 text-rose-600" /> Ordered Items ({selectedOrder.items?.length || 0})
-              </h4>
-              <div className="divide-y divide-slate-200">
-                {selectedOrder.items?.map((item, idx) => (
-                  <div key={idx} className="py-3 flex items-center justify-between gap-4 first:pt-0 last:pb-0">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-12 h-12 rounded-xl object-cover bg-white border border-slate-200 flex-shrink-0"
-                      />
-                      <div>
-                        <p className="text-xs font-bold text-slate-900">{item.title}</p>
-                        <div className="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
-                          <span>Variant: {item.colorName || 'Standard'}</span>
-                          <span className="text-slate-300">•</span>
-                          <span className="font-mono text-slate-400 text-[10px]">SKU: {item.variantSku}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs font-bold text-slate-900 font-mono">
-                        ₹{item.totalPrice?.toLocaleString('en-IN')}
-                      </p>
-                      <p className="text-[10px] text-slate-400">
-                        ₹{item.unitPrice?.toLocaleString('en-IN')} × {item.quantity}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* DEDICATED MEESHO RESELLER FULFILLMENT BOX */}
-            <div className="bg-emerald-50/50 rounded-3xl border-2 border-emerald-200 p-6 space-y-5 shadow-sm relative overflow-hidden">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-200/80 pb-4">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-700">
-                    <Zap className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-                      Meesho Reseller Fulfillment Engine
-                    </h3>
-                    <p className="text-xs text-slate-600">
-                      Step 2: Enter courier details generated by Meesho to auto-dispatch & resolve tracking.
-                    </p>
-                  </div>
-                </div>
-
-                {/* WhatsApp Notification Link Button */}
-                {(selectedOrder.trackingDetails?.trackingNumber || meeshoAwb) && (
-                  <a
-                    href={getWhatsAppLink(selectedOrder)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    WhatsApp Customer Update
-                  </a>
-                )}
-              </div>
-
-              <form onSubmit={handleMeeshoFulfill} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Courier Partner Selection */}
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                      Courier Partner (from Meesho) *
-                    </label>
-                    <select
-                      value={meeshoCourier}
-                      onChange={(e) => setMeeshoCourier(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-900 font-bold focus:outline-none focus:border-emerald-500 shadow-sm"
-                    >
-                      {MEESHO_COURIERS.map((c) => (
-                        <option key={c} value={c}>
-                          {c} Express
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* AWB Tracking Code */}
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                      Meesho AWB / Tracking Code *
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 12839210984 (Delhivery / Shadowfax AWB)"
-                      value={meeshoAwb}
-                      onChange={(e) => setMeeshoAwb(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-900 font-mono placeholder-slate-400 focus:outline-none focus:border-emerald-500 shadow-sm"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Auto-Resolved Tracking URL Preview */}
-                {meeshoAwb.trim() && (
-                  <div className="bg-white p-3 rounded-xl border border-emerald-200 flex items-center justify-between gap-3 text-xs shadow-sm">
-                    <span className="text-slate-600 truncate">
-                      Official Public Tracking Link:{' '}
-                      <strong className="text-emerald-700 font-mono">
-                        {generateTrackingUrl(meeshoCourier, meeshoAwb)}
-                      </strong>
-                    </span>
-                    <a
-                      href={generateTrackingUrl(meeshoCourier, meeshoAwb)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-slate-700 hover:text-emerald-700 flex-shrink-0 flex items-center gap-1 font-bold"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" /> Test Link
-                    </a>
-                  </div>
-                )}
-
-                <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-                  <button
-                    type="submit"
-                    disabled={meeshoLoading || !meeshoAwb.trim()}
-                    className="w-full sm:flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
-                  >
-                    {meeshoLoading ? (
-                      <>
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                        <span>Fulfilling Order...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Truck className="w-4 h-4" />
-                        <span>Mark as Shipped & Save Tracking</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            {/* General Dispatch & Status Changer Form */}
-            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 space-y-4">
-              <div className="flex items-center gap-2">
-                <Truck className="w-4 h-4 text-rose-600" />
-                <h4 className="text-xs font-black text-slate-900 uppercase tracking-tight">
-                  Advanced Manual Lifecycle & Status Override
-                </h4>
-              </div>
-
-              <form onSubmit={handleUpdateOrderStatus} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Status Dropdown */}
-                  <div>
-                    <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                      Pipeline Stage Status
-                    </label>
-                    <select
-                      value={statusForm.status}
-                      onChange={(e) =>
-                        setStatusForm({ ...statusForm, status: e.target.value })
-                      }
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-900 font-bold focus:outline-none focus:border-rose-500 shadow-sm"
-                    >
-                      {STATUS_OPTIONS.map((st) => (
-                        <option key={st} value={st}>
-                          {st.replace(/_/g, ' ')}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Internal Comment */}
-                  <div>
-                    <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                      Internal Audit Note
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Delivered by courier agent"
-                      value={statusForm.comment}
-                      onChange={(e) =>
-                        setStatusForm({ ...statusForm, comment: e.target.value })
-                      }
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-rose-500 shadow-sm"
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={updateLoading}
-                  className="w-full py-3 bg-slate-900 hover:bg-rose-600 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-2 shadow-sm"
-                >
-                  {updateLoading ? (
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Send className="w-4 h-4" />
-                  )}
-                  <span>Commit Manual Status Transition</span>
-                </button>
-              </form>
-            </div>
-
-            {/* Audit / Timeline Trail */}
-            {selectedOrder.statusTimeline && selectedOrder.statusTimeline.length > 0 && (
-              <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5 space-y-3">
-                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-rose-600" /> Audit Timeline Trail
-                </h4>
-                <div className="space-y-3">
-                  {selectedOrder.statusTimeline.map((step, idx) => (
-                    <div key={idx} className="flex items-start gap-3 text-xs">
-                      <div className="w-2 h-2 rounded-full bg-rose-600 mt-1.5 flex-shrink-0"></div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-slate-900 uppercase tracking-wider">
-                            {step.status}
-                          </span>
-                          <span className="text-slate-400 font-mono text-[11px]">
-                            {new Date(step.timestamp).toLocaleString('en-IN', {
-                              dateStyle: 'short',
-                              timeStyle: 'short',
-                            })}
-                          </span>
-                        </div>
-                        {step.comment && (
-                          <p className="text-slate-500 text-xs mt-0.5">{step.comment}</p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          <button
+            onClick={() => setToast(null)}
+            className="text-slate-400 hover:text-slate-600 transition"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
+
+      {/* Page Title & Stats */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            Order Fulfillment & OMS
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Manage live orders, enforce fulfillment state machines, assign couriers, and inspect customer audit trails.
+          </p>
+        </div>
+      </div>
+
+      {/* Orders Data Table */}
+      <AdminOrdersList
+        orders={orders}
+        loading={loading}
+        pagination={pagination}
+        statusCounts={statusCounts}
+        activeStatus={activeStatus}
+        searchQuery={searchQuery}
+        paymentFilter={paymentFilter}
+        onStatusChange={(newStatus) => {
+          setActiveStatus(newStatus);
+          setPagination((prev) => ({ ...prev, currentPage: 1 }));
+        }}
+        onSearchChange={setSearchQuery}
+        onPaymentFilterChange={(val) => {
+          setPaymentFilter(val);
+          setPagination((prev) => ({ ...prev, currentPage: 1 }));
+        }}
+        onPageChange={(page) => fetchOrders(page)}
+        onSelectOrder={handleSelectOrder}
+      />
+
+      {/* Order Detail & Fulfillment Action Modal */}
+      <AdminOrderDetail
+        order={selectedOrder}
+        isOpen={isDetailOpen}
+        onClose={() => {
+          setIsDetailOpen(false);
+          setSelectedOrder(null);
+        }}
+        onUpdateStatus={handleUpdateStatus}
+        actionLoading={actionLoading}
+      />
     </div>
   );
 };

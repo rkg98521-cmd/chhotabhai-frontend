@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-// Support both 'https://domain.com' and 'https://domain.com/api/v1', trimming any trailing slashes
-const rawBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1').trim().replace(/\/+$/, '');
-const API_BASE_URL = rawBaseUrl.endsWith('/api/v1') ? rawBaseUrl : `${rawBaseUrl}/api/v1`;
+// Support both 'https://domain.com' and 'https://domain.com/api/v1', strip accidental 'VITE_API_URL=' prefix, and trim trailing slashes
+const envUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1').trim();
+const cleanUrl = envUrl.replace(/^VITE_API_URL\s*=\s*/i, '').replace(/\/+$/, '');
+const API_BASE_URL = cleanUrl.endsWith('/api/v1') ? cleanUrl : `${cleanUrl}/api/v1`;
 
 export const axiosInstance = axios.create({
   baseURL: API_BASE_URL,

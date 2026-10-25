@@ -27,6 +27,20 @@ const CURATED_IMAGE_REPLACEMENTS = {
     'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&auto=format&fit=crop&q=80',
   'chhotabhai energyshroom pb300 pro':
     'https://images.unsplash.com/photo-1609592426508-cc24f60500bf?w=800&auto=format&fit=crop&q=80',
+  'chhotabhai 3-in-1 foldable magsafe wireless charging station':
+    'https://images.unsplash.com/photo-1622445262464-84b14e4b7571?w=800&auto=format&fit=crop&q=80',
+  'chhotabhai ultra hybrid anti-yellowing clear case':
+    'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=800&auto=format&fit=crop&q=80',
+  'chhotabhai 120w liquid silicone type-c fast cable':
+    'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=800&auto=format&fit=crop&q=80',
+  'chhotabhai 20000mah 65w pd turbo laptop power bank':
+    'https://images.unsplash.com/photo-1609592426508-cc24f60500bf?w=800&auto=format&fit=crop&q=80',
+  'chhotabhai gravity auto-lock metal car air vent mount':
+    'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=800&auto=format&fit=crop&q=80',
+  'chhotabhai sapphire individual camera lens protector':
+    'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80',
+  'chhotabhai sonic pods pro wireless earbuds':
+    'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800&auto=format&fit=crop&q=80',
 };
 
 export const ProductCard = ({ product }) => {

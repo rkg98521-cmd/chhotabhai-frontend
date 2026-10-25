@@ -26,10 +26,17 @@ export const AdminDashboard = () => {
         axiosInstance.get('/admin/analytics'),
         axiosInstance.get('/admin/orders'),
       ]);
-      setAnalytics(analyticsRes.data.data);
-      setOrders(ordersRes.data.data || []);
+      setAnalytics(analyticsRes.data.data || {});
+      const ordersData = ordersRes.data.data;
+      const ordersList = Array.isArray(ordersData)
+        ? ordersData
+        : Array.isArray(ordersData?.orders)
+        ? ordersData.orders
+        : [];
+      setOrders(ordersList);
     } catch (err) {
       console.error('Admin Dashboard Load:', err);
+      setOrders([]);
     } finally {
       setLoading(false);
     }
@@ -41,7 +48,9 @@ export const AdminDashboard = () => {
 
   if (loading) return <Loader text="Loading Enterprise Analytics..." />;
 
-  const outOfStockAlerts = analytics?.outOfStockAlerts || [];
+  const safeAnalytics = analytics || {};
+  const outOfStockAlerts = Array.isArray(safeAnalytics.outOfStockAlerts) ? safeAnalytics.outOfStockAlerts : [];
+  const safeOrders = Array.isArray(orders) ? orders : [];
 
   return (
     <div className="space-y-8 w-full">
@@ -56,7 +65,7 @@ export const AdminDashboard = () => {
 
         <button
           onClick={fetchDashboardData}
-          className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:border-rose-500 text-slate-700 text-xs font-bold rounded-xl transition-all shadow-sm"
+          className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:border-rose-500 text-slate-700 text-xs font-bold rounded-xl transition-all shadow-sm cursor-pointer"
         >
           <RefreshCw className="w-3.5 h-3.5 text-rose-600" /> Refresh Metrics
         </button>
@@ -73,7 +82,7 @@ export const AdminDashboard = () => {
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-black text-slate-900 mt-4">
-            ₹{(analytics?.totalRevenue || 0).toLocaleString('en-IN')}
+            ₹{Number(safeAnalytics.totalRevenue || 0).toLocaleString('en-IN')}
           </div>
           <span className="text-[11px] text-emerald-600 font-bold mt-1.5 flex items-center gap-1">
             <TrendingUp className="w-3.5 h-3.5" /> 100% Verified Settled
@@ -89,7 +98,7 @@ export const AdminDashboard = () => {
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-black text-slate-900 mt-4">
-            {analytics?.totalOrders || orders.length}
+            {safeAnalytics.totalOrders ?? safeOrders.length}
           </div>
           <span className="text-[11px] text-slate-400 font-bold mt-1.5 block">Pipeline orders</span>
         </div>
@@ -103,7 +112,7 @@ export const AdminDashboard = () => {
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-black text-slate-900 mt-4">
-            {analytics?.totalProducts || 0}
+            {safeAnalytics.totalProducts || 0}
           </div>
           <span className="text-[11px] text-blue-600 font-bold mt-1.5 block">Active Catalog Drops</span>
         </div>
@@ -137,9 +146,9 @@ export const AdminDashboard = () => {
                 <span className="font-bold text-slate-900 block truncate">{item.title}</span>
                 <span className="text-[10px] text-slate-500 block">Brand: {item.brand}</span>
                 <div className="mt-2 space-y-1">
-                  {item.lowVariants?.map((v, idx) => (
+                  {(Array.isArray(item.lowVariants) ? item.lowVariants : []).map((v, idx) => (
                     <span key={idx} className="text-[11px] text-amber-700 block font-mono">
-                      • {v.sku} ({v.color}): <strong>{v.stock} left</strong>
+                      • {v.sku} ({v.color || 'Default'}): <strong>{v.stock} left</strong>
                     </span>
                   ))}
                 </div>
@@ -176,48 +185,66 @@ export const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {orders.slice(0, 6).map((ord) => (
-                <tr key={ord._id} className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
-                    {ord.orderNumber || ord._id.slice(-6)}
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <span className="font-bold text-slate-900 block">{ord.user?.name || 'Customer'}</span>
-                    <span className="text-[10px] text-slate-400">{ord.user?.email}</span>
-                  </td>
-                  <td className="py-3.5 px-4 font-black text-slate-900">
-                    ₹{(ord.pricingSummary?.grandTotal || ord.totalPrice)?.toLocaleString('en-IN')}
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <span className="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] text-slate-700 font-medium">
-                      {ord.paymentInfo?.method || ord.paymentMethod}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                        ord.orderStatus === 'DELIVERED'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : ord.orderStatus === 'SHIPPED'
-                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                          : ord.orderStatus === 'PROCESSING'
-                          ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                          : 'bg-rose-50 text-rose-600 border border-rose-200'
-                      }`}
-                    >
-                      {ord.orderStatus}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4 text-right">
-                    <Link
-                      to="/admin/orders"
-                      className="px-3 py-1 bg-slate-100 border border-slate-200 hover:border-rose-500 hover:text-rose-600 text-slate-700 text-[11px] font-bold rounded-lg transition-colors"
-                    >
-                      Inspect
-                    </Link>
+              {safeOrders.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-slate-400 font-medium">
+                    No customer orders placed yet.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                safeOrders.slice(0, 6).map((ord) => {
+                  if (!ord) return null;
+                  const displayId = ord.orderNumber || (ord._id ? String(ord._id).slice(-6) : 'N/A');
+                  const customerName = ord.user?.name || ord.shippingAddress?.fullName || 'Customer';
+                  const customerEmail = ord.user?.email || ord.shippingAddress?.phone || '';
+                  const total = Number(ord.pricingSummary?.grandTotal || ord.totalPrice || 0);
+                  const paymentMethod = ord.paymentInfo?.method || ord.paymentMethod || 'PREPAID';
+                  const status = ord.orderStatus || 'PENDING';
+
+                  return (
+                    <tr key={ord._id || Math.random()} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
+                        {displayId}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className="font-bold text-slate-900 block">{customerName}</span>
+                        {customerEmail && <span className="text-[10px] text-slate-400">{customerEmail}</span>}
+                      </td>
+                      <td className="py-3.5 px-4 font-black text-slate-900">
+                        ₹{total.toLocaleString('en-IN')}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] text-slate-700 font-medium">
+                          {paymentMethod}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                            status === 'DELIVERED'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : status === 'SHIPPED'
+                              ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                              : status === 'PROCESSING'
+                              ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                              : 'bg-rose-50 text-rose-600 border border-rose-200'
+                          }`}
+                        >
+                          {status}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <Link
+                          to="/admin/orders"
+                          className="px-3 py-1 bg-slate-100 border border-slate-200 hover:border-rose-500 hover:text-rose-600 text-slate-700 text-[11px] font-bold rounded-lg transition-colors"
+                        >
+                          Inspect
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

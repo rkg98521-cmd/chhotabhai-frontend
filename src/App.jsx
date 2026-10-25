@@ -5,11 +5,13 @@ import AdminLayout from './layout/AdminLayout';
 import Home from './pages/Home';
 import Shop from './pages/Shop';
 import Loader from './components/Loader';
+import WhatsAppButton from './components/common/WhatsAppButton';
 
 // Code-split heavy routes with React.lazy
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const Cart = lazy(() => import('./pages/Cart'));
 const Checkout = lazy(() => import('./pages/Checkout'));
+const OrderStatus = lazy(() => import('./pages/OrderStatus'));
 const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
 const OrderTrack = lazy(() => import('./pages/OrderTrack'));
 const MyOrders = lazy(() => import('./pages/MyOrders'));
@@ -51,18 +53,34 @@ class ErrorBoundary extends React.Component {
               !
             </div>
             <h2 className="text-xl font-black uppercase tracking-tight text-slate-900 mb-2">Something went wrong</h2>
-            <p className="text-xs text-slate-500 mb-6">
+            <p className="text-xs text-slate-500 mb-4">
               An unexpected error occurred while loading this view.
             </p>
-            <button
-              onClick={() => {
-                this.setState({ hasError: false });
-                window.location.reload();
-              }}
-              className="px-6 py-3 bg-slate-900 hover:bg-rose-600 text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-sm"
-            >
-              Reload Page
-            </button>
+            {this.state.error?.message && (
+              <p className="text-[11px] font-mono text-rose-600 bg-rose-50 p-2.5 rounded-xl border border-rose-100 mb-6 break-words max-w-full text-left">
+                {this.state.error.message}
+              </p>
+            )}
+            <div className="flex items-center justify-center gap-3">
+              <button
+                onClick={() => {
+                  this.setState({ hasError: false, error: null });
+                  window.location.reload();
+                }}
+                className="px-5 py-2.5 bg-slate-900 hover:bg-rose-600 text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-sm cursor-pointer"
+              >
+                Reload Page
+              </button>
+              <button
+                onClick={() => {
+                  this.setState({ hasError: false, error: null });
+                  window.location.href = '/';
+                }}
+                className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-sm cursor-pointer"
+              >
+                Go Home
+              </button>
+            </div>
           </div>
         </div>
       );
@@ -84,6 +102,7 @@ export const App = () => {
             <Route path="product/:slug" element={<ProductDetail />} />
             <Route path="cart" element={<Cart />} />
             <Route path="checkout" element={<Checkout />} />
+            <Route path="order-status/:orderId" element={<OrderStatus />} />
             <Route path="order-success/:orderId" element={<OrderSuccess />} />
             <Route path="order-track" element={<OrderTrack />} />
             <Route path="order-track/:orderId" element={<OrderTrack />} />
@@ -106,6 +125,7 @@ export const App = () => {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
+      <WhatsAppButton />
       </ErrorBoundary>
     </BrowserRouter>
   );

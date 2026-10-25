@@ -51,6 +51,25 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  googleLogin: async (credential) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await axiosInstance.post('/auth/google', { credential });
+      const { user, token } = response.data.data;
+
+      localStorage.setItem('chhota_auth_token', token);
+      localStorage.setItem('chhota_user', JSON.stringify(user));
+
+      set({ user, token, isAuthenticated: true, loading: false });
+      useCartStore.getState().fetchCart();
+      return user;
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || 'Google sign-in failed. Please try again.';
+      set({ error: msg, loading: false });
+      throw err;
+    }
+  },
+
   logout: () => {
     localStorage.removeItem('chhota_auth_token');
     localStorage.removeItem('chhota_user');
@@ -60,14 +79,16 @@ export const useAuthStore = create((set, get) => ({
 
   fetchMe: async () => {
     const token = get().token;
-    if (!token) return;
+    if (!token) return null;
     try {
       const response = await axiosInstance.get('/auth/me');
       const user = response.data.data;
       localStorage.setItem('chhota_user', JSON.stringify(user));
       set({ user, isAuthenticated: true });
+      return user;
     } catch {
       get().logout();
+      return null;
     }
   },
 }));
