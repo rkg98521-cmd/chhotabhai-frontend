@@ -42,9 +42,17 @@ axiosInstance.interceptors.response.use(
       window.dispatchEvent(new CustomEvent('auth:unauthorized'));
     }
 
+    let errorMsg = error.response?.data?.message || error.message || 'Something went wrong';
+    if (error.message === 'Network Error') {
+      errorMsg = 'Cannot reach backend server. Please check your internet connection or backend deployment.';
+      console.warn(
+        `[Network Error] Unable to connect to ${API_BASE_URL}. Ensure your backend server is deployed and VITE_API_URL is configured in your hosting dashboard.`
+      );
+    }
+
     const customError = {
       status: error.response?.status || 500,
-      message: error.response?.data?.message || error.message || 'Something went wrong',
+      message: errorMsg,
       errors: error.response?.data?.errors || [],
     };
 
