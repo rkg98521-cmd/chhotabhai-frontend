@@ -29,6 +29,7 @@ import Loader from '../components/Loader';
 import CategoryIcon from '../components/common/CategoryIcon';
 import { useFilterStore } from '../store/useStore';
 import { useDeviceStore } from '../store/useDeviceStore';
+import { FALLBACK_PRODUCTS } from '../data/fallbackProducts';
 
 export const Home = () => {
   const navigate = useNavigate();
@@ -157,12 +158,15 @@ export const Home = () => {
     'chhotabhai n52 magsafe 15w wireless car mount',
   ];
 
-  // Dynamic Crazy Deals: Checked in Admin panel, fallback to screenshotOrder
-  const adminCrazyDeals = products.filter((p) => p.isCrazyDeal);
+  // Resilient products pool: If API is loading or returned 0 items, use FALLBACK_PRODUCTS
+  const activeProductsPool = products.length > 0 ? products : FALLBACK_PRODUCTS;
+
+  // Dynamic Crazy Deals: Checked in Admin panel, fallback to screenshotOrder or FALLBACK_PRODUCTS
+  const adminCrazyDeals = activeProductsPool.filter((p) => p.isCrazyDeal);
   const crazyDeals =
     adminCrazyDeals.length > 0
       ? adminCrazyDeals.slice(0, 18)
-      : [...products]
+      : [...activeProductsPool]
           .sort((a, b) => {
             const aIdx = screenshotOrder.indexOf((a.title || '').toLowerCase());
             const bIdx = screenshotOrder.indexOf((b.title || '').toLowerCase());
@@ -173,7 +177,7 @@ export const Home = () => {
           })
           .slice(0, 18);
 
-  const displayDeals = crazyDeals;
+  const displayDeals = crazyDeals.length > 0 ? crazyDeals : FALLBACK_PRODUCTS.slice(0, 6);
 
   const [topDealTab, setTopDealTab] = useState('All Deals');
 
@@ -198,7 +202,7 @@ export const Home = () => {
   ];
 
   // Dynamic Top Deals: Filtered by category tab and isTopDeal from admin
-  const categoryFiltered = products.filter((p) => {
+  const categoryFiltered = activeProductsPool.filter((p) => {
     if (topDealTab === 'All Deals') return true;
     const catSlug = typeof p.category === 'object' ? p.category?.slug : p.category;
     if (topDealTab === 'soundbars') {
@@ -214,7 +218,7 @@ export const Home = () => {
   const topDeals =
     markedTopDeals.length > 0
       ? markedTopDeals.slice(0, 6)
-      : categoryFiltered
+      : (categoryFiltered.length > 0 ? categoryFiltered : activeProductsPool)
           .sort((a, b) => {
             const aIdx = topDealsOrder.indexOf((a.title || '').toLowerCase());
             const bIdx = topDealsOrder.indexOf((b.title || '').toLowerCase());
@@ -710,15 +714,11 @@ export const Home = () => {
         </div>
 
         {/* Product Deals Grid (Exact 6-column layout matching boAt desktop) */}
-        {loading ? (
-          <Loader text="Loading Crazy Deals..." />
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-3.5 xl:gap-4">
-            {(displayDeals || []).map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-3.5 xl:gap-4">
+          {(displayDeals || []).map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </div>
       </section>
 
       {/* 4. TOP DEALS SECTION (Exact boAt replica with Category Filter Tabs & 6 Cards) */}
@@ -763,15 +763,11 @@ export const Home = () => {
         </div>
 
         {/* Top Deals Product Grid */}
-        {loading ? (
-          <Loader text="Loading Top Deals..." />
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-3.5 xl:gap-4">
-            {(topDeals || []).map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-3.5 xl:gap-4">
+          {(topDeals || []).map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </div>
       </section>
 
       {/* 5. SHOP BY CATEGORIES (Exact boAt 2-line circular avatar showcase) */}
