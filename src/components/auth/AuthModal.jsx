@@ -101,7 +101,7 @@ export const AuthModal = () => {
       />
 
       {/* ChhotaBhai Branded Dialog Card */}
-      <div className="relative w-full max-w-[390px] sm:max-w-[420px] bg-white rounded-[28px] sm:rounded-[32px] border border-slate-200/90 shadow-[0_25px_60px_-12px_rgba(0,0,0,0.25)] p-6 sm:p-8 flex flex-col justify-between text-left z-10 animate-in zoom-in-95 fade-in duration-200">
+      <div className="relative w-full max-w-[390px] sm:max-w-[420px] min-h-[490px] sm:min-h-[530px] bg-white rounded-[28px] sm:rounded-[32px] border border-slate-200/90 shadow-[0_25px_60px_-12px_rgba(0,0,0,0.25)] p-6 sm:p-8 flex flex-col justify-between text-left z-10 animate-in zoom-in-95 fade-in duration-200">
         
         {/* Top Header Bar: Brand Logo (Left) + Close Button (Right) */}
         <div className="flex items-center justify-between">
@@ -241,25 +241,25 @@ export const AuthModal = () => {
         )}
 
         {/* =========================================================================
-            MODE 2: EMAIL / PASSWORD EXPANDED FORM
+            MODE 2: EMAIL / PASSWORD EXPANDED FORM (Roomy, Clean & Spacious)
         ========================================================================= */}
         {mode === 'email' && (
-          <div className="mt-4 text-left animate-in fade-in duration-200">
+          <div className="flex-1 flex flex-col justify-between mt-5 animate-in fade-in duration-200">
             {/* Back button & Tab Switcher */}
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-4">
               <button
                 type="button"
                 onClick={() => setMode('splash')}
-                className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 hover:text-slate-900 transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition cursor-pointer"
               >
-                <ArrowLeft className="w-3.5 h-3.5" /> Back
+                <ArrowLeft className="w-4 h-4" /> Back
               </button>
 
-              <div className="flex p-0.5 bg-slate-100 rounded-lg">
+              <div className="flex p-1 bg-slate-100 rounded-xl">
                 <button
                   type="button"
                   onClick={() => setIsRegister(false)}
-                  className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition cursor-pointer ${
+                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
                     !isRegister ? 'bg-[#e11938] text-white shadow-xs' : 'text-slate-600'
                   }`}
                 >
@@ -268,7 +268,7 @@ export const AuthModal = () => {
                 <button
                   type="button"
                   onClick={() => setIsRegister(true)}
-                  className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition cursor-pointer ${
+                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
                     isRegister ? 'bg-[#e11938] text-white shadow-xs' : 'text-slate-600'
                   }`}
                 >
@@ -277,11 +277,11 @@ export const AuthModal = () => {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-2.5">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {isRegister && (
                 <>
                   <div>
-                    <label className="text-[10px] font-bold text-slate-700 block mb-0.5">
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
                       Full Name
                     </label>
                     <div className="relative">
@@ -291,14 +291,14 @@ export const AuthModal = () => {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="John Doe"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 px-3 pl-8 text-xs text-slate-900 outline-none focus:border-[#e11938] focus:bg-white transition"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 sm:py-3 px-3.5 pl-10 text-xs sm:text-sm text-slate-900 outline-none focus:border-[#e11938] focus:bg-white transition"
                       />
-                      <User className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                      <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-bold text-slate-700 block mb-0.5">
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
                       Phone Number (Optional)
                     </label>
                     <div className="relative">
@@ -307,16 +307,16 @@ export const AuthModal = () => {
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         placeholder="+91 9876543210"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 px-3 pl-8 text-xs text-slate-900 outline-none focus:border-[#e11938] focus:bg-white transition"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 sm:py-3 px-3.5 pl-10 text-xs sm:text-sm text-slate-900 outline-none focus:border-[#e11938] focus:bg-white transition"
                       />
-                      <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                      <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     </div>
                   </div>
                 </>
               )}
 
               <div>
-                <label className="text-[10px] font-bold text-slate-700 block mb-0.5">
+                <label className="text-xs font-bold text-slate-700 block mb-1">
                   Email Address
                 </label>
                 <div className="relative">
@@ -326,22 +326,22 @@ export const AuthModal = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="you@domain.com"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 px-3 pl-8 text-xs text-slate-900 outline-none focus:border-[#e11938] focus:bg-white transition"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 sm:py-3 px-3.5 pl-10 text-xs sm:text-sm text-slate-900 outline-none focus:border-[#e11938] focus:bg-white transition"
                   />
-                  <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 </div>
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-0.5">
-                  <label className="text-[10px] font-bold text-slate-700">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-slate-700">
                     Password
                   </label>
                   {!isRegister && (
                     <button
                       type="button"
                       onClick={() => setShowForgot(true)}
-                      className="text-[10px] text-[#e11938] hover:underline font-bold"
+                      className="text-xs text-[#e11938] hover:underline font-bold"
                     >
                       Forgot?
                     </button>
@@ -354,15 +354,15 @@ export const AuthModal = () => {
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     placeholder="••••••••"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 px-3 pl-8 pr-8 text-xs text-slate-900 outline-none focus:border-[#e11938] focus:bg-white transition"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 sm:py-3 px-3.5 pl-10 pr-10 text-xs sm:text-sm text-slate-900 outline-none focus:border-[#e11938] focus:bg-white transition"
                   />
-                  <Lock className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                   >
-                    {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
@@ -370,10 +370,10 @@ export const AuthModal = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-3 py-2.5 bg-[#e11938] hover:bg-[#be123c] text-white text-xs font-bold uppercase rounded-xl transition cursor-pointer shadow-xs active:scale-[0.99] flex items-center justify-center gap-1.5"
+                className="w-full mt-4 h-13 sm:h-14 bg-[#e11938] hover:bg-[#be123c] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-2xl transition cursor-pointer shadow-md active:scale-[0.99] flex items-center justify-center gap-2"
               >
                 {loading ? (
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <span>{isRegister ? 'Create Account' : 'Sign In'}</span>
                 )}
