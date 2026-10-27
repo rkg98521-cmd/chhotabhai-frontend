@@ -3,21 +3,18 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Home,
   LayoutGrid,
-  Gift,
+  Zap,
   X,
   ChevronRight,
   ArrowRight,
-  Sparkles,
-  Smartphone,
 } from 'lucide-react';
-import { useDeviceStore } from '../../store/useDeviceStore';
 import { useFilterStore } from '../../store/useStore';
 import CategoryIcon from '../common/CategoryIcon';
 
 /**
  * MobileBottomNav Component
- * Faithful implementation of the modern mobile e-commerce bottom navigation bar (boAt style)
- * Includes: Home, Categories (with slide-up drawer), Rewards, Personalisation, and Chat (WhatsApp)
+ * Faithful implementation of modern mobile e-commerce bottom navigation
+ * Includes: Home, Categories (with slide-up drawer), Crazy Deals, and Chat (WhatsApp)
  * Full safe area support for iOS / Android home bars.
  */
 export const MobileBottomNav = () => {
@@ -25,7 +22,6 @@ export const MobileBottomNav = () => {
   const navigate = useNavigate();
   const [categoriesDrawerOpen, setCategoriesDrawerOpen] = useState(false);
 
-  const { openModal: openDeviceModal, selectedDevice } = useDeviceStore();
   const { setCategory } = useFilterStore();
 
   const rawNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '9852124942';
@@ -56,23 +52,13 @@ export const MobileBottomNav = () => {
   ];
 
   const isHomeActive = location.pathname === '/' && !categoriesDrawerOpen;
-  const isShopActive = (location.pathname === '/shop' || categoriesDrawerOpen) && !location.search.includes('deal=flash');
-  const isRewardsActive = location.search.includes('deal=flash') || location.search.includes('rewards');
+  const isShopActive = (location.pathname === '/shop' || categoriesDrawerOpen) && !location.search.includes('deal') && !location.search.includes('crazy-deals');
+  const isDealsActive = location.search.includes('deal') || location.search.includes('crazy-deals');
 
   const handleCategorySelect = (slug) => {
     setCategory(slug);
     setCategoriesDrawerOpen(false);
     navigate(`/shop?category=${slug}`);
-  };
-
-  const handleRewardsClick = () => {
-    setCategoriesDrawerOpen(false);
-    navigate('/shop?deal=flash');
-  };
-
-  const handlePersonalisationClick = () => {
-    setCategoriesDrawerOpen(false);
-    openDeviceModal();
   };
 
   return (
@@ -228,58 +214,30 @@ export const MobileBottomNav = () => {
             )}
           </button>
 
-          {/* TAB 3: REWARDS (Special Red Gift Accent) */}
-          <button
-            type="button"
-            onClick={handleRewardsClick}
+          {/* TAB 3: CRAZY DEALS */}
+          <Link
+            to="/shop?filter=crazy-deals"
+            onClick={() => setCategoriesDrawerOpen(false)}
             className="flex-1 flex flex-col items-center justify-center py-1 relative text-center group cursor-pointer active:scale-95 transition-transform"
           >
             <div className="relative flex items-center justify-center">
-              <Gift
-                className="w-5 h-5 text-[#e11938] stroke-[2.2] animate-bounce"
-                style={{ animationDuration: '2.5s' }}
+              <Zap
+                className={`w-5 h-5 transition-colors ${
+                  isDealsActive ? 'text-[#e11938] stroke-[2.4]' : 'text-slate-500 stroke-[1.8]'
+                }`}
               />
             </div>
             <span
               className={`text-[10px] tracking-tight leading-none mt-1 transition-colors ${
-                isRewardsActive ? 'font-black text-[#e11938]' : 'font-medium text-slate-600'
+                isDealsActive ? 'font-black text-[#e11938]' : 'font-medium text-slate-500'
               }`}
             >
-              Rewards
+              Crazy Deals
             </span>
-            {isRewardsActive && (
+            {isDealsActive && (
               <span className="w-5 h-[2.5px] bg-[#e11938] rounded-full mt-0.5" />
             )}
-          </button>
-
-          {/* TAB 4: PERSONALISATION (Device / Accessories Customizer) */}
-          <button
-            type="button"
-            onClick={handlePersonalisationClick}
-            className="flex-1 flex flex-col items-center justify-center py-1 relative text-center group cursor-pointer active:scale-95 transition-transform"
-          >
-            <div className="relative flex items-center justify-center">
-              <div className="relative">
-                {/* Clean Customizer Icon matching pen/device reference */}
-                <svg
-                  viewBox="0 0 24 24"
-                  className="w-5 h-5 text-slate-700 stroke-current fill-none stroke-[1.8]"
-                >
-                  <path
-                    d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                {selectedDevice && (
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#e11938] rounded-full ring-2 ring-white" />
-                )}
-              </div>
-            </div>
-            <span className="text-[10px] tracking-tight leading-none mt-1 font-medium text-slate-600 truncate max-w-[64px]">
-              Personalisation
-            </span>
-          </button>
+          </Link>
 
           {/* TAB 5: CHAT (Official WhatsApp API Integration) */}
           <a

@@ -406,14 +406,6 @@ export const Home = () => {
                           <span>Shop Now</span>
                           <ArrowRight className="w-4 h-4 text-[#730814]" />
                         </Link>
-                        <button
-                          type="button"
-                          onClick={openDeviceModal}
-                          className="px-6 sm:px-7 py-3.5 sm:py-4 bg-black/35 hover:bg-black/50 border border-white/20 text-white font-bold text-xs sm:text-sm uppercase tracking-wider rounded-xl transition-all backdrop-blur-xs flex items-center gap-2 cursor-pointer"
-                        >
-                          <Smartphone className="w-4 h-4 text-amber-300" />
-                          <span>Personalise Gear</span>
-                        </button>
                       </div>
                     </div>
 
@@ -819,7 +811,7 @@ export const Home = () => {
         <div className="bg-[#f8fafc] border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xs relative overflow-hidden">
           <div className="max-w-2xl space-y-3 relative z-10">
             <span className="text-xs font-black uppercase text-[#e11938] tracking-wider flex items-center gap-1.5">
-              <Smartphone className="w-4 h-4" /> ChhotaBhai Personalisation & Device Studio
+              <Smartphone className="w-4 h-4" /> Smartphone Compatibility Studio
             </span>
             <h2 className="text-xl sm:text-3xl font-black uppercase text-slate-900 tracking-tight">
               Find Precision Accessories For <span className="text-[#e11938]">Your Smartphone</span>
