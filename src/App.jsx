@@ -110,8 +110,8 @@ export const App = () => {
             <Route path="track" element={<OrderTrack />} />
             <Route path="my-orders" element={<MyOrders />} />
             <Route path="wishlist" element={<Wishlist />} />
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<Login />} />
+            <Route path="login" element={<Home />} />
+            <Route path="register" element={<Home />} />
           </Route>
 
           {/* Enterprise Admin Console Protected Routes */}

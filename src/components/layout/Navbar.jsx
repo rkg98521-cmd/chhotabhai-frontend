@@ -37,7 +37,7 @@ export const Navbar = () => {
   const userDropdownRef = useRef(null);
 
 
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout, openAuthModal } = useAuthStore();
   const { totalItems, openDrawer, fetchCart } = useCartStore();
   const { items: wishlistItems } = useWishlistStore();
   const { setSearchQuery: setGlobalSearch, setCategory } = useFilterStore();
@@ -377,14 +377,15 @@ export const Navbar = () => {
                   )}
                 </div>
               ) : (
-                <Link
-                  to="/login"
+                <button
+                  type="button"
+                  onClick={openAuthModal}
                   className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-800 transition cursor-pointer focus:outline-none shrink-0"
                   title="Sign In"
                   aria-label="Sign In"
                 >
                   <UserIcon className="w-5 h-5 text-slate-800" strokeWidth={1.8} />
-                </Link>
+                </button>
               )}
             </div>
 
@@ -442,13 +443,16 @@ export const Navbar = () => {
               </button>
             </div>
           ) : (
-            <Link
-              to="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-900 text-white text-xs font-bold rounded-xl"
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                openAuthModal();
+              }}
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-900 text-white text-xs font-bold rounded-xl cursor-pointer"
             >
               <UserIcon className="w-4 h-4" /> Sign In / Register
-            </Link>
+            </button>
           )}
 
           {/* Mobile Search */}

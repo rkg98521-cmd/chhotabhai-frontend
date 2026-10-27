@@ -8,8 +8,12 @@ export const useAuthStore = create((set, get) => ({
   user: JSON.parse(localStorage.getItem('chhota_user') || 'null'),
   token: localStorage.getItem('chhota_auth_token') || null,
   isAuthenticated: !!localStorage.getItem('chhota_auth_token'),
+  isAuthModalOpen: false,
   loading: false,
   error: null,
+
+  openAuthModal: () => set({ isAuthModalOpen: true, error: null }),
+  closeAuthModal: () => set({ isAuthModalOpen: false, error: null }),
 
   login: async (email, password) => {
     set({ loading: true, error: null });
@@ -20,7 +24,7 @@ export const useAuthStore = create((set, get) => ({
       localStorage.setItem('chhota_auth_token', token);
       localStorage.setItem('chhota_user', JSON.stringify(user));
 
-      set({ user, token, isAuthenticated: true, loading: false });
+      set({ user, token, isAuthenticated: true, isAuthModalOpen: false, loading: false });
 
       // Automatically sync user cart on login
       useCartStore.getState().fetchCart();
@@ -41,7 +45,7 @@ export const useAuthStore = create((set, get) => ({
       localStorage.setItem('chhota_auth_token', token);
       localStorage.setItem('chhota_user', JSON.stringify(user));
 
-      set({ user, token, isAuthenticated: true, loading: false });
+      set({ user, token, isAuthenticated: true, isAuthModalOpen: false, loading: false });
       useCartStore.getState().fetchCart();
       return user;
     } catch (err) {
@@ -60,7 +64,7 @@ export const useAuthStore = create((set, get) => ({
       localStorage.setItem('chhota_auth_token', token);
       localStorage.setItem('chhota_user', JSON.stringify(user));
 
-      set({ user, token, isAuthenticated: true, loading: false });
+      set({ user, token, isAuthenticated: true, isAuthModalOpen: false, loading: false });
       useCartStore.getState().fetchCart();
       return user;
     } catch (err) {
