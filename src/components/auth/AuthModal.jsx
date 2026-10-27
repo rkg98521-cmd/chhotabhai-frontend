@@ -100,16 +100,16 @@ export const AuthModal = () => {
         className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-200 animate-in fade-in"
       />
 
-      {/* ChhotaBhai Branded Dialog Card */}
-      <div className="relative w-full max-w-[390px] sm:max-w-[420px] min-h-[490px] sm:min-h-[530px] bg-white rounded-[28px] sm:rounded-[32px] border border-slate-200/90 shadow-[0_25px_60px_-12px_rgba(0,0,0,0.25)] p-6 sm:p-8 flex flex-col justify-between text-left z-10 animate-in zoom-in-95 fade-in duration-200">
+      {/* Pro-Engineered ChhotaBhai Dialog Card (Proportional, balanced & spacious) */}
+      <div className="relative w-full max-w-[410px] sm:max-w-[430px] bg-white rounded-[30px] sm:rounded-[34px] border border-slate-200/90 shadow-[0_25px_60px_-12px_rgba(0,0,0,0.28)] p-6 sm:p-8 text-left z-10 animate-in zoom-in-95 fade-in duration-200">
         
         {/* Top Header Bar: Brand Logo (Left) + Close Button (Right) */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#e11938] to-[#ff4d6d] flex items-center justify-center text-white font-black text-sm shadow-xs">
               cb
             </div>
-            <span className="text-lg font-black text-slate-900 tracking-tight font-sans">
+            <span className="text-xl font-black text-slate-900 tracking-tight font-sans">
               Chhota<span className="text-[#e11938]">Bhai</span>
             </span>
           </div>
@@ -126,23 +126,23 @@ export const AuthModal = () => {
 
         {/* Global Error Banner */}
         {error && (
-          <div className="mt-3 p-2.5 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2 text-rose-700 text-xs animate-in fade-in">
+          <div className="mt-4 p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2.5 text-rose-700 text-xs animate-in fade-in">
             <AlertCircle className="w-4 h-4 shrink-0 text-[#e11938]" />
-            <span className="truncate">{error}</span>
+            <span className="leading-snug">{error}</span>
           </div>
         )}
 
         {/* =========================================================================
-            MODE 1: SPLASH (Exact formatting from reference image, in ChhotaBhai theme)
+            MODE 1: SPLASH (Google + Email Selection)
         ========================================================================= */}
         {mode === 'splash' && (
           <div className="animate-in fade-in duration-200">
-            {/* Text Hierarchy: WELCOME TO -> ChhotaBhai -> Subtitle */}
+            {/* Header Text Hierarchy */}
             <div className="pt-6 sm:pt-7 space-y-1">
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#e11938]">
                 WELCOME TO
               </p>
-              <h2 className="text-2xl sm:text-[28px] font-black tracking-tight text-slate-900 font-sans leading-none">
+              <h2 className="text-2xl sm:text-[30px] font-black tracking-tight text-slate-900 font-sans leading-tight">
                 Chhota<span className="text-[#e11938]">Bhai</span>
               </h2>
               <p className="text-xs sm:text-[13px] text-slate-500 font-medium leading-relaxed pt-1">
@@ -150,15 +150,15 @@ export const AuthModal = () => {
               </p>
             </div>
 
-            {/* Action Buttons: Google + Email with separator and arrows (Bigger height & font) */}
+            {/* Action Buttons: Google + Email (Both large, identical height & generous padding) */}
             <div className="mt-7 sm:mt-8 space-y-3.5">
               {/* 1. Continue with Google */}
-              <div className="relative w-full h-14 sm:h-15 rounded-full bg-white hover:bg-slate-50 border border-slate-300 shadow-xs hover:shadow-sm flex items-center justify-between px-5 sm:px-6 transition active:scale-[0.99] cursor-pointer overflow-hidden group">
+              <div className="relative w-full h-14 sm:h-15 rounded-2xl bg-white hover:bg-slate-50 border border-slate-300 shadow-xs hover:shadow-sm flex items-center justify-between px-5 transition active:scale-[0.99] cursor-pointer overflow-hidden group">
                 <div className="absolute inset-0 opacity-0 z-20 flex items-center justify-center overflow-hidden cursor-pointer scale-125">
                   <GoogleLogin
                     onSuccess={handleGoogleSuccess}
                     onError={handleGoogleError}
-                    shape="pill"
+                    shape="rectangular"
                     size="large"
                     width="400"
                   />
@@ -196,7 +196,7 @@ export const AuthModal = () => {
               <button
                 type="button"
                 onClick={() => setMode('email')}
-                className="w-full h-14 sm:h-15 rounded-full bg-slate-900 hover:bg-black text-white shadow-xs hover:shadow-sm flex items-center justify-between px-5 sm:px-6 transition active:scale-[0.99] cursor-pointer group"
+                className="w-full h-14 sm:h-15 rounded-2xl bg-slate-900 hover:bg-black text-white shadow-xs hover:shadow-sm flex items-center justify-between px-5 transition active:scale-[0.99] cursor-pointer group"
               >
                 <div className="flex items-center gap-3.5">
                   <div className="w-5 h-5 flex items-center justify-center">
@@ -213,8 +213,8 @@ export const AuthModal = () => {
             </div>
 
             {/* Bottom Disclaimer with Shield (Centered) */}
-            <div className="mt-8 pt-4 border-t border-slate-100 flex flex-col items-center justify-center text-center text-[11px] text-slate-500">
-              <div className="flex items-center justify-center gap-1.5 mb-0.5">
+            <div className="mt-8 pt-5 border-t border-slate-100 flex flex-col items-center justify-center text-center text-[11px] text-slate-500">
+              <div className="flex items-center justify-center gap-1.5 mb-1">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span>By continuing, you agree to our</span>
               </div>
@@ -241,26 +241,27 @@ export const AuthModal = () => {
         )}
 
         {/* =========================================================================
-            MODE 2: EMAIL / PASSWORD EXPANDED FORM (Roomy, Clean & Spacious)
+            MODE 2: EMAIL / PASSWORD EXPANDED FORM (Roomy, Proportional & Bold Inputs)
         ========================================================================= */}
         {mode === 'email' && (
-          <div className="flex-1 flex flex-col justify-between mt-5 animate-in fade-in duration-200">
-            {/* Back button & Tab Switcher */}
-            <div className="flex items-center justify-between mb-4">
+          <div className="pt-4 animate-in fade-in duration-200">
+            {/* Header: Back Button & Mode Title */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <button
                 type="button"
                 onClick={() => setMode('splash')}
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition cursor-pointer"
               >
-                <ArrowLeft className="w-4 h-4" /> Back
+                <ArrowLeft className="w-4 h-4" /> Back to options
               </button>
 
+              {/* Segmented Sign In / Register Tabs */}
               <div className="flex p-1 bg-slate-100 rounded-xl">
                 <button
                   type="button"
                   onClick={() => setIsRegister(false)}
                   className={`px-3 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
-                    !isRegister ? 'bg-[#e11938] text-white shadow-xs' : 'text-slate-600'
+                    !isRegister ? 'bg-[#e11938] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   Sign In
@@ -269,7 +270,7 @@ export const AuthModal = () => {
                   type="button"
                   onClick={() => setIsRegister(true)}
                   className={`px-3 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
-                    isRegister ? 'bg-[#e11938] text-white shadow-xs' : 'text-slate-600'
+                    isRegister ? 'bg-[#e11938] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   Register
@@ -277,64 +278,81 @@ export const AuthModal = () => {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Form Title & Context */}
+            <div className="pt-4 pb-2">
+              <h3 className="text-xl font-black text-slate-900 tracking-tight">
+                {isRegister ? 'Create an Account' : 'Welcome Back'}
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {isRegister
+                  ? 'Sign up to track your orders and save items to wishlist.'
+                  : 'Enter your credentials to continue to ChhotaBhai.'}
+              </p>
+            </div>
+
+            {/* Input Form Fields: Roomy, Tall & Premium Inputs */}
+            <form onSubmit={handleSubmit} className="space-y-4 pt-2">
               {isRegister && (
                 <>
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                  {/* Full Name */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-800 block">
                       Full Name
                     </label>
-                    <div className="relative">
+                    <div className="relative h-13 rounded-2xl bg-slate-50 border border-slate-200/90 focus-within:border-[#e11938] focus-within:bg-white focus-within:ring-4 focus-within:ring-rose-500/10 transition-all">
+                      <User className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
                         required
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="John Doe"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 sm:py-3 px-3.5 pl-10 text-xs sm:text-sm text-slate-900 outline-none focus:border-[#e11938] focus:bg-white transition"
+                        placeholder="e.g. Rahul Sharma"
+                        className="w-full h-full bg-transparent pl-12 pr-4 text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400"
                       />
-                      <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                  {/* Phone */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-800 block">
                       Phone Number (Optional)
                     </label>
-                    <div className="relative">
+                    <div className="relative h-13 rounded-2xl bg-slate-50 border border-slate-200/90 focus-within:border-[#e11938] focus-within:bg-white focus-within:ring-4 focus-within:ring-rose-500/10 transition-all">
+                      <Phone className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                       <input
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        placeholder="+91 9876543210"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 sm:py-3 px-3.5 pl-10 text-xs sm:text-sm text-slate-900 outline-none focus:border-[#e11938] focus:bg-white transition"
+                        placeholder="+91 98765 43210"
+                        className="w-full h-full bg-transparent pl-12 pr-4 text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400"
                       />
-                      <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     </div>
                   </div>
                 </>
               )}
 
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
+              {/* Email Address */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-800 block">
                   Email Address
                 </label>
-                <div className="relative">
+                <div className="relative h-13 rounded-2xl bg-slate-50 border border-slate-200/90 focus-within:border-[#e11938] focus-within:bg-white focus-within:ring-4 focus-within:ring-rose-500/10 transition-all">
+                  <Mail className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
                     type="email"
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="you@domain.com"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 sm:py-3 px-3.5 pl-10 text-xs sm:text-sm text-slate-900 outline-none focus:border-[#e11938] focus:bg-white transition"
+                    className="w-full h-full bg-transparent pl-12 pr-4 text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400"
                   />
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 </div>
               </div>
 
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-slate-700">
+              {/* Password */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-800">
                     Password
                   </label>
                   {!isRegister && (
@@ -343,34 +361,35 @@ export const AuthModal = () => {
                       onClick={() => setShowForgot(true)}
                       className="text-xs text-[#e11938] hover:underline font-bold"
                     >
-                      Forgot?
+                      Forgot password?
                     </button>
                   )}
                 </div>
-                <div className="relative">
+                <div className="relative h-13 rounded-2xl bg-slate-50 border border-slate-200/90 focus-within:border-[#e11938] focus-within:bg-white focus-within:ring-4 focus-within:ring-rose-500/10 transition-all">
+                  <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     placeholder="••••••••"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 sm:py-3 px-3.5 pl-10 pr-10 text-xs sm:text-sm text-slate-900 outline-none focus:border-[#e11938] focus:bg-white transition"
+                    className="w-full h-full bg-transparent pl-12 pr-12 text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400"
                   />
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 cursor-pointer p-1"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
 
+              {/* Submit CTA (Matched to input height, powerful crimson button) */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-4 h-13 sm:h-14 bg-[#e11938] hover:bg-[#be123c] text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-2xl transition cursor-pointer shadow-md active:scale-[0.99] flex items-center justify-center gap-2"
+                className="w-full h-13 sm:h-14 mt-6 bg-[#e11938] hover:bg-[#be123c] text-white text-sm font-bold uppercase tracking-wider rounded-2xl transition cursor-pointer shadow-lg shadow-rose-600/25 active:scale-[0.99] flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -386,42 +405,45 @@ export const AuthModal = () => {
             FORGOT PASSWORD SUB-VIEW
         ========================================================================= */}
         {showForgot && (
-          <div className="absolute inset-0 bg-white rounded-[28px] sm:rounded-[32px] p-6 sm:p-8 flex flex-col justify-between z-30 animate-in fade-in">
+          <div className="absolute inset-0 bg-white rounded-[30px] sm:rounded-[34px] p-6 sm:p-8 flex flex-col justify-between z-30 animate-in fade-in">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-slate-900 uppercase">
+                <h3 className="text-base font-black text-slate-900 uppercase">
                   Reset Password
                 </h3>
                 <button
                   onClick={() => setShowForgot(false)}
-                  className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-800"
+                  className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-800"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
-              <p className="text-[11px] text-slate-500 mb-3">
+              <p className="text-xs text-slate-500 mb-4 leading-relaxed">
                 Enter your account email to receive a password reset link.
               </p>
 
               {forgotSent ? (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-xs flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                   <span>Reset link sent to <strong>{forgotEmail}</strong>.</span>
                 </div>
               ) : (
-                <form onSubmit={handleForgotSubmit} className="space-y-2.5">
-                  <input
-                    type="email"
-                    required
-                    value={forgotEmail}
-                    onChange={(e) => setForgotEmail(e.target.value)}
-                    placeholder="Enter email address"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 px-3 text-xs text-slate-900 outline-none"
-                  />
+                <form onSubmit={handleForgotSubmit} className="space-y-4">
+                  <div className="relative h-13 rounded-2xl bg-slate-50 border border-slate-200/90 focus-within:border-[#e11938] focus-within:bg-white focus-within:ring-4 focus-within:ring-rose-500/10 transition-all">
+                    <Mail className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="email"
+                      required
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      placeholder="Enter email address"
+                      className="w-full h-full bg-transparent pl-12 pr-4 text-sm font-semibold text-slate-900 outline-none"
+                    />
+                  </div>
                   <button
                     type="submit"
-                    className="w-full py-2 bg-[#e11938] text-white text-xs font-bold uppercase rounded-xl transition"
+                    className="w-full h-13 bg-[#e11938] text-white text-xs font-bold uppercase tracking-wider rounded-2xl transition shadow-md"
                   >
                     Send Reset Link
                   </button>
@@ -431,7 +453,7 @@ export const AuthModal = () => {
 
             <button
               onClick={() => setShowForgot(false)}
-              className="w-full py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 text-center cursor-pointer"
+              className="w-full py-2.5 text-xs font-bold text-slate-500 hover:text-slate-800 text-center cursor-pointer"
             >
               ← Back to Sign In
             </button>
