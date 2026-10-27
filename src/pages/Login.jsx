@@ -11,7 +11,6 @@ import {
   AlertCircle,
   ShieldCheck,
   CheckCircle2,
-  Sparkles,
   HelpCircle,
   X,
   MessageCircle
@@ -27,7 +26,6 @@ export const Login = () => {
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotSent, setForgotSent] = useState(false);
-  const [demoFeedback, setDemoFeedback] = useState('');
 
   // Dynamically calculate Google button width to prevent overflow on small mobile screens
   const [googleWidth, setGoogleWidth] = useState('320');
@@ -105,30 +103,6 @@ export const Login = () => {
     navigate(registerMode ? '/register' : '/login', { replace: true });
   };
 
-  // Quick autofill demo credentials helper
-  const autofillDemo = (role) => {
-    if (role === 'admin') {
-      setFormData({
-        name: 'Store Administrator',
-        email: 'admin@chhotabhai.com',
-        password: 'Admin@12345',
-        phone: '9852124942',
-      });
-      setIsRegister(false);
-      setDemoFeedback('Admin demo loaded');
-    } else {
-      setFormData({
-        name: 'Rohit Customer',
-        email: 'rohit@chhotabhai.com',
-        password: 'Customer@12345',
-        phone: '9852124942',
-      });
-      setIsRegister(false);
-      setDemoFeedback('Customer demo loaded');
-    }
-    setTimeout(() => setDemoFeedback(''), 2500);
-  };
-
   const handleForgotSubmit = (e) => {
     e.preventDefault();
     if (!forgotEmail) return;
@@ -183,38 +157,6 @@ export const Login = () => {
           >
             Create Account
           </button>
-        </div>
-
-        {/* Demo Fast Login Pills */}
-        <div className="mb-4 p-2.5 bg-slate-50/90 border border-slate-200/70 rounded-2xl">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-[#e11938]" />
-              Quick Demo Access
-            </span>
-            {demoFeedback && (
-              <span className="text-[10px] font-bold text-emerald-600 flex items-center gap-1 animate-in fade-in">
-                <CheckCircle2 className="w-3 h-3" />
-                {demoFeedback}
-              </span>
-            )}
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => autofillDemo('customer')}
-              className="px-2.5 py-1.5 text-[11px] font-bold text-slate-700 bg-white hover:bg-slate-100 active:scale-98 border border-slate-200 rounded-xl transition flex items-center justify-center gap-1 cursor-pointer"
-            >
-              <span>Customer Demo</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => autofillDemo('admin')}
-              className="px-2.5 py-1.5 text-[11px] font-bold text-rose-700 bg-rose-50/60 hover:bg-rose-100/70 active:scale-98 border border-rose-200/80 rounded-xl transition flex items-center justify-center gap-1 cursor-pointer"
-            >
-              <span>Admin Demo</span>
-            </button>
-          </div>
         </div>
 
         {/* Error Alert */}
