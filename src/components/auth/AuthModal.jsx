@@ -212,20 +212,30 @@ export const AuthModal = () => {
               </button>
             </div>
 
-            {/* Bottom Disclaimer with Shield (Exact match with reference image) */}
-            <div className="mt-8 pt-4 border-t border-slate-100 flex items-start gap-2 text-[11px] text-slate-500 leading-tight">
+            {/* Bottom Disclaimer with Shield */}
+            <div className="mt-8 pt-4 border-t border-slate-100 flex items-start gap-2.5 text-[11px] text-slate-500">
               <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-              <span>
-                By continuing, you agree to our{' '}
-                <Link to="/terms" onClick={handleClose} className="text-slate-900 font-semibold underline underline-offset-2 hover:text-[#e11938]">
-                  Terms of Service
-                </Link>{' '}
-                and{' '}
-                <Link to="/privacy" onClick={handleClose} className="text-slate-900 font-semibold underline underline-offset-2 hover:text-[#e11938]">
-                  Privacy Policy
-                </Link>
-                .
-              </span>
+              <div className="flex flex-col leading-tight">
+                <span>By continuing, you agree to our</span>
+                <span className="mt-0.5">
+                  <Link
+                    to="/terms"
+                    onClick={handleClose}
+                    className="text-slate-900 font-bold underline underline-offset-2 hover:text-[#e11938]"
+                  >
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link
+                    to="/privacy"
+                    onClick={handleClose}
+                    className="text-slate-900 font-bold underline underline-offset-2 hover:text-[#e11938]"
+                  >
+                    Privacy Policy
+                  </Link>
+                  .
+                </span>
+              </div>
             </div>
           </div>
         )}
