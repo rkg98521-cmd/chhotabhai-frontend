@@ -29,33 +29,9 @@ export const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [selectedDevice, setSelectedDevice] = useState(globalDevice?.model || '');
-  const [availableDevices, setAvailableDevices] = useState([]);
-  const [deviceSearch, setDeviceSearch] = useState('');
-  const [deviceError, setDeviceError] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
-
-  useEffect(() => {
-    if (globalDevice?.model && !selectedDevice) {
-      setSelectedDevice(globalDevice.model);
-    }
-  }, [globalDevice]);
-
-  useEffect(() => {
-    const fetchDevices = async () => {
-      try {
-        const res = await axiosInstance.get('/devices');
-        if (res.data?.data && Array.isArray(res.data.data)) {
-          setAvailableDevices(res.data.data);
-        }
-      } catch (err) {
-        console.warn('Could not load devices:', err);
-      }
-    };
-    fetchDevices();
-  }, []);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -108,38 +84,15 @@ export const ProductDetail = () => {
   const discountPercent = mrp > sellingPrice ? Math.round(((mrp - sellingPrice) / mrp) * 100) : 0;
   const stockQuantity = currentVariant.stockQuantity ?? product.countInStock ?? 20;
 
-  const isPhoneCompatible =
-    Boolean(product.supportedDevices && product.supportedDevices.length > 0) ||
-    ['mobile-back-covers', 'tempered-glass', 'camera-lens-protectors', 'back-cases'].includes(
-      product.category?.slug
-    ) ||
-    /cover|case|glass|tempered|lens|magsafe|screen/i.test(product.title || '') ||
-    /cover|case|glass|tempered|lens|magsafe|screen/i.test(product.category?.name || '');
-
-  const phoneModelsList =
-    product.supportedDevices && product.supportedDevices.length > 0
-      ? product.supportedDevices
-      : availableDevices.map((d) => d.modelName);
-
-  const filteredPhoneModels = phoneModelsList.filter((m) =>
-    m.toLowerCase().includes(deviceSearch.toLowerCase())
-  );
-
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
 
-    if (isPhoneCompatible && !selectedDevice) {
-      setDeviceError(true);
-      return;
-    }
-    setDeviceError(false);
-
     try {
       setAdding(true);
-      await addToCart(currentVariant.sku, quantity, product._id, selectedDevice || globalDevice?.model);
+      await addToCart(currentVariant.sku, quantity, product._id);
       setAdded(true);
       setTimeout(() => setAdded(false), 2200);
     } catch (err) {
@@ -150,10 +103,6 @@ export const ProductDetail = () => {
   };
 
   const handleBuyNow = async () => {
-    if (isPhoneCompatible && !selectedDevice) {
-      setDeviceError(true);
-      return;
-    }
     await handleAddToCart();
     navigate('/checkout');
   };
@@ -296,73 +245,6 @@ export const ProductDetail = () => {
                   </button>
                 ))}
               </div>
-            </div>
-          )}
-
-          {/* Phone Compatibility Selector (for cases, covers & tempered glass) */}
-          {isPhoneCompatible && phoneModelsList.length > 0 && (
-            <div className={`space-y-2 p-4 rounded-2xl border transition-all ${
-              deviceError ? 'border-brand-red bg-rose-50/50' : 'border-slate-200 bg-slate-50/80'
-            }`}>
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-black uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
-                  <Smartphone className="w-3.5 h-3.5 text-brand-red" /> Select Your Phone Model:
-                </label>
-                {selectedDevice ? (
-                  <span className="text-[11px] font-black text-brand-red bg-white px-2.5 py-0.5 rounded-full border border-slate-200 flex items-center gap-1 shadow-sm">
-                    <Check className="w-3 h-3 text-emerald-600" /> {selectedDevice}
-                  </span>
-                ) : (
-                  <span className="text-[10px] font-bold text-amber-600 uppercase">
-                    Model Required
-                  </span>
-                )}
-              </div>
-
-              {/* Quick Search Input */}
-              <div className="relative">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search your phone (e.g. iPhone 16, Galaxy S24, OnePlus 12)..."
-                  value={deviceSearch}
-                  onChange={(e) => setDeviceSearch(e.target.value)}
-                  className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 outline-none focus:border-brand-red"
-                />
-              </div>
-
-              {/* Scrollable Model Chips */}
-              <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pt-1 pr-1 scrollbar-thin">
-                {filteredPhoneModels.length > 0 ? (
-                  filteredPhoneModels.map((dev) => (
-                    <button
-                      key={dev}
-                      type="button"
-                      onClick={() => {
-                        setSelectedDevice(dev);
-                        setGlobalDevice('', dev);
-                        setDeviceError(false);
-                      }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-left flex items-center gap-1.5 ${
-                        selectedDevice === dev
-                          ? 'bg-brand-red text-white shadow-sm'
-                          : 'bg-white text-slate-700 hover:text-slate-900 border border-slate-200 hover:border-slate-300'
-                      }`}
-                    >
-                      {dev}
-                      {selectedDevice === dev && <Check className="w-3 h-3" />}
-                    </button>
-                  ))
-                ) : (
-                  <span className="text-xs text-slate-500 py-1">No phone model matches &ldquo;{deviceSearch}&rdquo;</span>
-                )}
-              </div>
-
-              {deviceError && (
-                <p className="text-[11px] font-bold text-brand-red flex items-center gap-1">
-                  ⚠️ Please select your exact phone model above to ensure 100% precision fitment.
-                </p>
-              )}
             </div>
           )}
 
