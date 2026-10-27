@@ -140,12 +140,24 @@ export const Navbar = () => {
       {/* MAIN HEADER NAVBAR */}
       <div className="cb-container">
         <div className="flex items-center justify-between h-16 sm:h-20 gap-3 xl:gap-5 flex-nowrap">
-          {/* ChhotaBhai Logo */}
-          <Link to="/" className="flex items-center gap-1 flex-shrink-0 group whitespace-nowrap">
-            <span className="text-2xl sm:text-3xl xl:text-4xl font-black text-slate-900 tracking-tighter font-sans select-none">
-              Chhota<span className="text-[#e11938]">Bhai</span>
-            </span>
-          </Link>
+          {/* Left Brand Area: Mobile 3-Lines Menu (Before Logo) + ChhotaBhai Logo */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            {/* Mobile Hamburger 3-Lines Menu Toggle (Before Logo) */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-1.5 -ml-1.5 lg:hidden text-slate-800 hover:bg-slate-100 rounded-xl transition cursor-pointer"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+
+            {/* ChhotaBhai Logo */}
+            <Link to="/" className="flex items-center gap-1 flex-shrink-0 group whitespace-nowrap">
+              <span className="text-2xl sm:text-3xl xl:text-4xl font-black text-slate-900 tracking-tighter font-sans select-none">
+                Chhota<span className="text-[#e11938]">Bhai</span>
+              </span>
+            </Link>
+          </div>
 
           {/* Desktop Navigation Links (Strict Single Line Flexbox with whitespace-nowrap) */}
           <nav className="hidden lg:flex items-center gap-4 xl:gap-6 2xl:gap-7 text-[13.5px] xl:text-[15px] font-semibold text-slate-800 flex-nowrap whitespace-nowrap shrink-0">
@@ -253,8 +265,8 @@ export const Navbar = () => {
             </div>
           </nav>
 
-          {/* Right Action Section (Search, Deals, Profile, Cart - Exact to boAt Image 2) */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          {/* Right Action Section (Search, Pure User Avatar Circle, Cart) */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Desktop Search Trigger Bar (Opens boAt SearchModal) */}
             <div
               onClick={() => setSearchModalOpen(true)}
@@ -267,7 +279,7 @@ export const Navbar = () => {
               </div>
             </div>
 
-            {/* boAt Mobile Search Button (Exact to Image 2) */}
+            {/* boAt Mobile Search Button */}
             <button
               type="button"
               onClick={() => setSearchModalOpen(true)}
@@ -278,28 +290,13 @@ export const Navbar = () => {
               <Search className="w-5 h-5 text-slate-800" strokeWidth={2} />
             </button>
 
-            {/* Wishlist Button with Counter */}
-            <Link
-              to="/wishlist"
-              className="p-2 hover:bg-rose-50 rounded-full transition text-slate-800 hover:text-[#e11938] relative cursor-pointer"
-              title="Wishlist"
-              aria-label="Wishlist"
-            >
-              <Heart className="w-5 h-5 text-slate-800 hover:text-[#e11938] transition-colors" strokeWidth={1.8} />
-              {wishlistItems?.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-[#e11938] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
-                  {wishlistItems.length}
-                </span>
-              )}
-            </Link>
-
-            {/* User Account Action */}
-            <div ref={userDropdownRef} className="relative">
+            {/* User Account Action - Pure Avatar Circle (No down arrow, no extra pill space) */}
+            <div ref={userDropdownRef} className="relative flex items-center">
               {isAuthenticated ? (
-                <div className="relative">
+                <div className="relative flex items-center">
                   <button
                     onClick={() => setUserDropdown(!userDropdown)}
-                    className="flex items-center gap-1.5 p-1 pl-1 pr-1.5 sm:pr-2 hover:bg-slate-100 rounded-full transition text-slate-800 cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-300 border border-slate-200/80"
+                    className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-90 transition cursor-pointer focus:outline-none shrink-0"
                     title="Account Profile"
                     aria-label="User Account"
                   >
@@ -308,21 +305,17 @@ export const Navbar = () => {
                         src={user.avatar}
                         alt={user?.name || 'User Profile'}
                         referrerPolicy="no-referrer"
-                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-2 ring-emerald-500/80 shadow-2xs"
+                        className="w-8 h-8 rounded-full object-cover ring-2 ring-purple-500/80 shadow-2xs"
                       />
                     ) : (
-                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center shadow-2xs">
-                        {user?.name ? user.name.charAt(0).toUpperCase() : <UserIcon className="w-4 h-4" />}
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 text-white text-xs font-black flex items-center justify-center shadow-xs">
+                        {user?.name ? user.name.trim().charAt(0).toUpperCase() : 'U'}
                       </div>
                     )}
-                    <span className="hidden md:inline-block text-xs font-bold text-slate-800 max-w-[100px] truncate">
-                      {user?.name?.split(' ')[0] || 'Account'}
-                    </span>
-                    <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${userDropdown ? 'rotate-180' : ''}`} />
                   </button>
 
                   {userDropdown && (
-                    <div className="absolute right-0 top-12 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in duration-150">
+                    <div className="absolute right-0 top-11 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in duration-150">
                       <div className="px-4 py-3 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
                         {user?.avatar ? (
                           <img
@@ -332,8 +325,8 @@ export const Navbar = () => {
                             className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-200 shrink-0"
                           />
                         ) : (
-                          <div className="w-9 h-9 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center shrink-0">
-                            {user?.name ? user.name.charAt(0).toUpperCase() : <UserIcon className="w-4 h-4" />}
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 text-white text-xs font-black flex items-center justify-center shrink-0">
+                            {user?.name ? user.name.trim().charAt(0).toUpperCase() : 'U'}
                           </div>
                         )}
                         <div className="min-w-0 flex-1">
@@ -349,6 +342,13 @@ export const Navbar = () => {
                           className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:text-[#e11938] hover:bg-slate-50 transition"
                         >
                           <Package className="w-4 h-4 text-slate-500" /> My Orders
+                        </Link>
+                        <Link
+                          to="/wishlist"
+                          onClick={() => setUserDropdown(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:text-[#e11938] hover:bg-slate-50 transition"
+                        >
+                          <Heart className="w-4 h-4 text-slate-500" /> My Wishlist
                         </Link>
                         {user?.role === 'admin' && (
                           <Link
@@ -379,12 +379,11 @@ export const Navbar = () => {
               ) : (
                 <Link
                   to="/login"
-                  className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-slate-100 rounded-full transition text-slate-800 text-xs font-bold border border-slate-200/80 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition shrink-0"
                   title="Sign In"
                   aria-label="Sign In"
                 >
                   <UserIcon className="w-4 h-4 text-slate-700" strokeWidth={2} />
-                  <span className="hidden sm:inline">Sign In</span>
                 </Link>
               )}
             </div>
@@ -402,15 +401,6 @@ export const Navbar = () => {
                   {totalItems}
                 </span>
               )}
-            </button>
-
-            {/* Mobile Hamburger Menu Toggle */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 lg:hidden text-slate-800 hover:bg-slate-100 rounded-xl"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
