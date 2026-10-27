@@ -3,12 +3,12 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Home,
   LayoutGrid,
-  Zap,
+  Heart,
   X,
   ChevronRight,
   ArrowRight,
 } from 'lucide-react';
-import { useFilterStore } from '../../store/useStore';
+import { useFilterStore, useWishlistStore } from '../../store/useStore';
 import CategoryIcon from '../common/CategoryIcon';
 
 /**
@@ -23,6 +23,7 @@ export const MobileBottomNav = () => {
   const [categoriesDrawerOpen, setCategoriesDrawerOpen] = useState(false);
 
   const { setCategory } = useFilterStore();
+  const { items: wishlistItems } = useWishlistStore();
 
   const rawNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '9852124942';
   const digitsOnly = String(rawNumber).replace(/\D/g, '');
@@ -53,7 +54,7 @@ export const MobileBottomNav = () => {
 
   const isHomeActive = location.pathname === '/' && !categoriesDrawerOpen;
   const isShopActive = (location.pathname === '/shop' || categoriesDrawerOpen) && !location.search.includes('deal') && !location.search.includes('crazy-deals');
-  const isDealsActive = location.search.includes('deal') || location.search.includes('crazy-deals');
+  const isWishlistActive = location.pathname === '/wishlist';
 
   const handleCategorySelect = (slug) => {
     setCategory(slug);
@@ -214,27 +215,34 @@ export const MobileBottomNav = () => {
             )}
           </button>
 
-          {/* TAB 3: CRAZY DEALS */}
+          {/* TAB 3: WISHLIST */}
           <Link
-            to="/shop?filter=crazy-deals"
+            to="/wishlist"
             onClick={() => setCategoriesDrawerOpen(false)}
             className="flex-1 flex flex-col items-center justify-center py-1 relative text-center group cursor-pointer active:scale-95 transition-transform"
           >
             <div className="relative flex items-center justify-center">
-              <Zap
+              <Heart
                 className={`w-5 h-5 transition-colors ${
-                  isDealsActive ? 'text-[#e11938] stroke-[2.4]' : 'text-slate-500 stroke-[1.8]'
+                  isWishlistActive
+                    ? 'text-[#e11938] fill-[#e11938] stroke-[2]'
+                    : 'text-slate-500 stroke-[1.8]'
                 }`}
               />
+              {wishlistItems?.length > 0 && (
+                <span className="absolute -top-1.5 -right-2 bg-[#e11938] text-white text-[9px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center shadow-xs">
+                  {wishlistItems.length}
+                </span>
+              )}
             </div>
             <span
               className={`text-[10px] tracking-tight leading-none mt-1 transition-colors ${
-                isDealsActive ? 'font-black text-[#e11938]' : 'font-medium text-slate-500'
+                isWishlistActive ? 'font-black text-[#e11938]' : 'font-medium text-slate-500'
               }`}
             >
-              Crazy Deals
+              Wishlist
             </span>
-            {isDealsActive && (
+            {isWishlistActive && (
               <span className="w-5 h-[2.5px] bg-[#e11938] rounded-full mt-0.5" />
             )}
           </Link>

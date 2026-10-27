@@ -16,6 +16,7 @@ const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
 const OrderTrack = lazy(() => import('./pages/OrderTrack'));
 const MyOrders = lazy(() => import('./pages/MyOrders'));
 const Login = lazy(() => import('./pages/Login'));
+const Wishlist = lazy(() => import('./pages/Wishlist'));
 
 // Admin Console Code-split routes
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
@@ -108,6 +109,7 @@ export const App = () => {
             <Route path="order-track/:orderId" element={<OrderTrack />} />
             <Route path="track" element={<OrderTrack />} />
             <Route path="my-orders" element={<MyOrders />} />
+            <Route path="wishlist" element={<Wishlist />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Login />} />
           </Route>

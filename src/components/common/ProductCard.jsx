@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Check, Loader2, ShoppingBag } from 'lucide-react';
-import { useCartStore } from '../../store/useStore';
+import { Star, Check, Loader2, ShoppingBag, Heart } from 'lucide-react';
+import { useCartStore, useWishlistStore } from '../../store/useStore';
 
 // Curated high-res product image fallbacks for mobile accessories & electronics
 const CURATED_IMAGE_REPLACEMENTS = {
@@ -51,6 +51,8 @@ export const ProductCard = ({ product }) => {
   const [added, setAdded] = useState(false);
 
   const { addToCart } = useCartStore();
+  const { isInWishlist, toggleWishlist } = useWishlistStore();
+  const wishlisted = isInWishlist(product._id || product.id);
 
   const variants = product.variants && product.variants.length > 0 ? product.variants : [];
   const currentVariant = variants[selectedVariantIndex] || variants[0] || {};
@@ -145,13 +147,34 @@ export const ProductCard = ({ product }) => {
           </div>
         )}
 
+        {/* Wishlist Heart Toggle Button (Always visible on mobile & desktop) */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleWishlist(product);
+          }}
+          title={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+          className={`absolute top-2 right-2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/95 hover:bg-white flex items-center justify-center transition-all shadow-xs z-10 cursor-pointer ${
+            wishlisted ? 'text-[#e11938]' : 'text-slate-400 hover:text-[#e11938]'
+          }`}
+          aria-label={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+        >
+          <Heart
+            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all ${
+              wishlisted ? 'fill-[#e11938] scale-110' : 'hover:scale-110'
+            }`}
+          />
+        </button>
+
         {/* Quick Add floating button (Hover action on desktop, clean & unobtrusive) */}
         <button
           type="button"
           onClick={handleQuickAdd}
           disabled={adding}
           title="Quick Add To Cart"
-          className={`absolute top-2 right-2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/95 hover:bg-white text-slate-900 flex items-center justify-center transition-all shadow-sm z-10 cursor-pointer ${
+          className={`absolute top-10 right-2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/95 hover:bg-white text-slate-900 flex items-center justify-center transition-all shadow-xs z-10 cursor-pointer ${
             added
               ? 'bg-emerald-600 text-white opacity-100 scale-100'
               : 'opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-95'

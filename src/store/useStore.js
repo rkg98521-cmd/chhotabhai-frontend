@@ -317,9 +317,53 @@ export const useFilterStore = create((set) => ({
     }),
 }));
 
+// =========================================================================
+// 4. WISHLIST STORE (LocalStorage Persistent)
+// =========================================================================
+export const useWishlistStore = create((set, get) => ({
+  items: JSON.parse(localStorage.getItem('chhota_wishlist') || '[]'),
+
+  addToWishlist: (product) => {
+    const current = get().items;
+    const exists = current.some((p) => (p._id || p.id) === (product._id || product.id));
+    if (!exists) {
+      const updated = [product, ...current];
+      localStorage.setItem('chhota_wishlist', JSON.stringify(updated));
+      set({ items: updated });
+    }
+  },
+
+  removeFromWishlist: (productId) => {
+    const updated = get().items.filter((p) => (p._id || p.id) !== productId);
+    localStorage.setItem('chhota_wishlist', JSON.stringify(updated));
+    set({ items: updated });
+  },
+
+  toggleWishlist: (product) => {
+    const current = get().items;
+    const exists = current.some((p) => (p._id || p.id) === (product._id || product.id));
+    if (exists) {
+      get().removeFromWishlist(product._id || product.id);
+    } else {
+      get().addToWishlist(product);
+    }
+  },
+
+  isInWishlist: (productId) => {
+    return get().items.some((p) => (p._id || p.id) === productId);
+  },
+
+  clearWishlist: () => {
+    localStorage.removeItem('chhota_wishlist');
+    set({ items: [] });
+  },
+}));
+
 // Keep backward-compatible exports
 export default {
   useAuthStore,
   useCartStore,
   useFilterStore,
+  useWishlistStore,
 };
+

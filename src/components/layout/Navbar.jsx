@@ -8,6 +8,7 @@ import {
   X,
   ChevronDown,
   Zap,
+  Heart,
   Package,
   Smartphone,
   Truck,
@@ -17,7 +18,7 @@ import {
   Building,
   Sparkles,
 } from 'lucide-react';
-import { useAuthStore, useCartStore, useFilterStore } from '../../store/useStore';
+import { useAuthStore, useCartStore, useFilterStore, useWishlistStore } from '../../store/useStore';
 import { useDeviceStore } from '../../store/useDeviceStore';
 import axiosInstance from '../../api/axiosInstance';
 import SearchModal from './SearchModal';
@@ -38,6 +39,7 @@ export const Navbar = () => {
 
   const { user, isAuthenticated, logout } = useAuthStore();
   const { totalItems, openDrawer, fetchCart } = useCartStore();
+  const { items: wishlistItems } = useWishlistStore();
   const { setSearchQuery: setGlobalSearch, setCategory } = useFilterStore();
   const { selectedDevice, openModal: openDeviceModal } = useDeviceStore();
   const navigate = useNavigate();
@@ -276,14 +278,19 @@ export const Navbar = () => {
               <Search className="w-5 h-5 text-slate-800" strokeWidth={2} />
             </button>
 
-            {/* boAt Lightning Flash Deals Button (Exact to Image 2) */}
+            {/* Wishlist Button with Counter */}
             <Link
-              to="/shop?filter=crazy-deals"
-              className="p-2 hover:bg-amber-50 rounded-full transition text-amber-500 hover:text-amber-600 cursor-pointer"
-              title="Flash Deals"
-              aria-label="Flash Deals"
+              to="/wishlist"
+              className="p-2 hover:bg-rose-50 rounded-full transition text-slate-800 hover:text-[#e11938] relative cursor-pointer"
+              title="Wishlist"
+              aria-label="Wishlist"
             >
-              <Zap className="w-5 h-5 fill-amber-400 stroke-amber-500" strokeWidth={1.5} />
+              <Heart className="w-5 h-5 text-slate-800 hover:text-[#e11938] transition-colors" strokeWidth={1.8} />
+              {wishlistItems?.length > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-[#e11938] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                  {wishlistItems.length}
+                </span>
+              )}
             </Link>
 
             {/* User Account Action */}
