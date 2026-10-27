@@ -6,7 +6,6 @@ import {
   User,
   Phone,
   ArrowLeft,
-  ArrowRight,
   Eye,
   EyeOff,
   AlertCircle,
@@ -89,23 +88,24 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#070709] text-white flex flex-col justify-between px-6 py-8 sm:py-12 relative overflow-hidden select-none font-sans">
+    <div className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-slate-100/70 text-slate-900 flex flex-col justify-between px-6 py-8 sm:py-12 relative overflow-hidden select-none font-sans">
       
-      {/* Ambient background glows for ultra-premium depth */}
-      <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-[#e11938]/12 rounded-full blur-[140px] pointer-events-none -z-0" />
-      <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[420px] h-[420px] bg-red-950/20 rounded-full blur-[120px] pointer-events-none -z-0" />
+      {/* Soft ambient brand atmosphere glows */}
+      <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[520px] h-[520px] bg-[#e11938]/6 rounded-full blur-[140px] pointer-events-none -z-0" />
+      <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[420px] h-[420px] bg-slate-200/50 rounded-full blur-[120px] pointer-events-none -z-0" />
 
-      {/* Top Header Row with Close Button */}
-      <div className="w-full max-w-md mx-auto flex items-center justify-between relative z-10">
-        <Link to="/" className="inline-flex items-center gap-1.5 opacity-80 hover:opacity-100 transition">
-          <span className="text-sm font-bold tracking-tight text-white/60">
-            Storefront
-          </span>
+      {/* Top Header Row with Back to Store & Close Button */}
+      <div className="w-full max-w-sm sm:max-w-md mx-auto flex items-center justify-between relative z-10">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition"
+        >
+          <span>← Back to Store</span>
         </Link>
 
         <Link
           to="/"
-          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition cursor-pointer"
+          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white hover:bg-slate-100 border border-slate-200/80 shadow-xs flex items-center justify-center text-slate-500 hover:text-slate-900 transition cursor-pointer"
           title="Close & return to store"
           aria-label="Close"
         >
@@ -113,41 +113,36 @@ export const Login = () => {
         </Link>
       </div>
 
-      {/* Center Branding Area (Exact Match to SparkAI Layout) */}
-      <div className="w-full max-w-sm sm:max-w-md mx-auto flex flex-col items-center text-center my-auto py-8 relative z-10">
+      {/* Center Branding Area (Exact SparkAI Layout in Website Theme) */}
+      <div className="w-full max-w-sm sm:max-w-md mx-auto flex flex-col items-center text-center my-auto py-6 sm:py-8 relative z-10">
         
-        {/* App Logo Squircle Icon with 3D Glass Depth */}
-        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[26px] bg-gradient-to-b from-[#222228] via-[#151518] to-[#0a0a0c] border border-white/15 shadow-[0_16px_40px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.25)] flex items-center justify-center relative p-3 group transition-transform duration-300 hover:scale-105">
+        {/* App Logo Squircle Icon (Website Theme: Crisp White Card with Depth & Red Glow) */}
+        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[26px] bg-white border border-slate-200/90 shadow-[0_12px_32px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.04)] flex items-center justify-center relative p-3 group transition-transform duration-300 hover:scale-105">
           {/* Subtle top reflection sheen */}
-          <div className="absolute top-0 inset-x-0 h-1/2 bg-gradient-to-b from-white/15 to-transparent rounded-t-[26px] pointer-events-none" />
+          <div className="absolute top-0 inset-x-0 h-1/2 bg-gradient-to-b from-white to-transparent rounded-t-[26px] pointer-events-none" />
 
           {/* Glowing Brand 3D Ribbon Monogram */}
           <svg
             viewBox="0 0 64 64"
-            className="w-12 h-12 sm:w-14 sm:h-14 filter drop-shadow-[0_4px_16px_rgba(225,25,56,0.65)]"
+            className="w-12 h-12 sm:w-14 sm:h-14 filter drop-shadow-[0_4px_12px_rgba(225,25,56,0.25)]"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
             <defs>
-              <linearGradient id="cbGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ffffff" />
-                <stop offset="45%" stopColor="#f43f5e" />
+              <linearGradient id="cbGradLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#f43f5e" />
                 <stop offset="100%" stopColor="#e11938" />
-              </linearGradient>
-              <linearGradient id="cbGradDark" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#e11938" />
-                <stop offset="100%" stopColor="#881337" />
               </linearGradient>
             </defs>
 
             {/* Futuristic Interlocking Sound & Shield Loops */}
             <path
               d="M32 10C21 10 12 19 12 30C12 37 16 43 22 46.5L25 41C20.5 38.5 18 34.5 18 30C18 22.5 24.5 16 32 16C39.5 16 46 22.5 46 30C46 34.5 43.5 38.5 39 41L42 46.5C48 43 52 37 52 30C52 19 43 10 32 10Z"
-              fill="url(#cbGrad)"
+              fill="url(#cbGradLight)"
             />
             <path
               d="M32 22C27.5 22 24 25.5 24 30C24 33.5 26 36.5 29 38L32 32.5L35 38C38 36.5 40 33.5 40 30C40 25.5 36.5 22 32 22Z"
-              fill="#ffffff"
+              fill="#0f172a"
             />
             {/* Center Dynamic Bass Core */}
             <circle cx="32" cy="48" r="5" fill="#e11938" />
@@ -156,31 +151,31 @@ export const Login = () => {
         </div>
 
         {/* Brand Name Title */}
-        <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mt-5 select-none font-sans">
+        <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mt-5 select-none font-sans">
           Chhota<span className="text-[#e11938]">Bhai</span>
         </h1>
 
         {/* Project Tagline Subtitle */}
-        <p className="text-xs sm:text-sm text-slate-400 font-medium tracking-wide mt-1.5">
+        <p className="text-xs sm:text-sm text-slate-500 font-medium tracking-wide mt-1.5">
           Smart Mobile Audio & Gear
         </p>
 
         {/* Global Error Display */}
         {error && (
-          <div className="mt-5 w-full p-3 bg-red-950/70 border border-red-500/30 rounded-2xl flex items-center justify-center gap-2 text-rose-300 text-xs animate-in fade-in duration-200">
+          <div className="mt-5 w-full p-3 bg-rose-50 border border-rose-200 rounded-2xl flex items-center justify-center gap-2 text-rose-700 text-xs animate-in fade-in duration-200">
             <AlertCircle className="w-4 h-4 shrink-0 text-[#e11938]" />
             <span>{error}</span>
           </div>
         )}
 
         {/* =========================================================================
-            VIEW 1: SPARK-AI STYLE MINIMALIST 2-BUTTON LANDING SCREEN (Default)
+            VIEW 1: SPARK-AI STYLE 2-BUTTON LANDING SCREEN (In Website Theme)
         ========================================================================= */}
         {viewMode === 'splash' && (
           <div className="w-full mt-8 sm:mt-10 space-y-3.5 animate-in fade-in duration-200">
             
-            {/* Primary Action 1: Continue with Google (Pill) */}
-            <div className="relative w-full h-13 sm:h-14 rounded-full bg-[#151518] hover:bg-[#1d1d22] border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.6)] flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer overflow-hidden group active:scale-[0.99]">
+            {/* Primary Action 1: Continue with Google (Clean White Pill) */}
+            <div className="relative w-full h-13 sm:h-14 rounded-full bg-white hover:bg-slate-50 border border-slate-200 shadow-xs hover:shadow-sm flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer overflow-hidden group active:scale-[0.99]">
               
               {/* Invisible GoogleLogin overlay catching clicks natively */}
               <div className="absolute inset-0 opacity-0 z-20 flex items-center justify-center overflow-hidden cursor-pointer scale-125">
@@ -213,18 +208,18 @@ export const Login = () => {
                 />
               </svg>
 
-              <span className="text-white text-sm sm:text-base font-semibold tracking-wide relative z-10">
+              <span className="text-slate-800 text-sm sm:text-base font-semibold tracking-wide relative z-10">
                 Continue with Google
               </span>
             </div>
 
-            {/* Primary Action 2: Continue with email (Pill) */}
+            {/* Primary Action 2: Continue with email (Sleek Slate-900 Pill) */}
             <button
               type="button"
               onClick={() => setViewMode('email')}
-              className="w-full h-13 sm:h-14 rounded-full bg-[#151518] hover:bg-[#1d1d22] border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.6)] flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer active:scale-[0.99]"
+              className="w-full h-13 sm:h-14 rounded-full bg-slate-900 hover:bg-slate-800 text-white shadow-sm hover:shadow-md flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer active:scale-[0.99]"
             >
-              <Mail className="w-5 h-5 text-slate-300 shrink-0" />
+              <Mail className="w-5 h-5 text-white/90 shrink-0" />
               <span className="text-white text-sm sm:text-base font-semibold tracking-wide">
                 Continue with email
               </span>
@@ -233,27 +228,27 @@ export const Login = () => {
         )}
 
         {/* =========================================================================
-            VIEW 2: EMAIL / PASSWORD EXPANDED FORM (When user clicks Continue with email)
+            VIEW 2: EMAIL / PASSWORD EXPANDED FORM (In Website Theme)
         ========================================================================= */}
         {viewMode === 'email' && (
-          <div className="w-full mt-6 bg-[#121215] border border-white/10 rounded-3xl p-5 sm:p-6 text-left shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-full mt-6 bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 text-left shadow-xl animate-in fade-in zoom-in-95 duration-200">
             
             {/* Back Button & Switcher Header */}
             <div className="flex items-center justify-between mb-4">
               <button
                 type="button"
                 onClick={() => setViewMode('splash')}
-                className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" /> Back
               </button>
 
-              <div className="flex p-0.5 bg-black/40 border border-white/5 rounded-xl">
+              <div className="flex p-0.5 bg-slate-100 border border-slate-200/60 rounded-xl">
                 <button
                   type="button"
                   onClick={() => setIsRegister(false)}
                   className={`px-3 py-1 text-xs font-bold rounded-lg transition cursor-pointer ${
-                    !isRegister ? 'bg-[#e11938] text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                    !isRegister ? 'bg-[#e11938] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   Sign In
@@ -262,7 +257,7 @@ export const Login = () => {
                   type="button"
                   onClick={() => setIsRegister(true)}
                   className={`px-3 py-1 text-xs font-bold rounded-lg transition cursor-pointer ${
-                    isRegister ? 'bg-[#e11938] text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                    isRegister ? 'bg-[#e11938] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   Register
@@ -275,7 +270,7 @@ export const Login = () => {
               {isRegister && (
                 <>
                   <div>
-                    <label className="text-[11px] font-bold text-slate-400 block mb-1">
+                    <label className="text-[11px] font-bold text-slate-700 block mb-1">
                       Full Name
                     </label>
                     <div className="relative">
@@ -285,15 +280,15 @@ export const Login = () => {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="e.g. Rohit Kumar"
-                        className="w-full bg-[#19191d] border border-white/10 focus:border-[#e11938] rounded-xl py-2.5 pl-9 pr-3 text-xs text-white placeholder-slate-500 outline-none transition"
+                        className="w-full bg-slate-50 hover:bg-slate-50/80 focus:bg-white border border-slate-200 focus:border-[#e11938] focus:ring-3 focus:ring-[#e11938]/10 rounded-xl py-2.5 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-400 outline-none transition"
                       />
-                      <User className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                      <User className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-slate-400 block mb-1">
-                      Phone Number <span className="text-slate-500 font-normal">(Optional)</span>
+                    <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                      Phone Number <span className="text-slate-400 font-normal">(Optional)</span>
                     </label>
                     <div className="relative">
                       <input
@@ -301,16 +296,16 @@ export const Login = () => {
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         placeholder="10-digit mobile number"
-                        className="w-full bg-[#19191d] border border-white/10 focus:border-[#e11938] rounded-xl py-2.5 pl-9 pr-3 text-xs text-white placeholder-slate-500 outline-none transition"
+                        className="w-full bg-slate-50 hover:bg-slate-50/80 focus:bg-white border border-slate-200 focus:border-[#e11938] focus:ring-3 focus:ring-[#e11938]/10 rounded-xl py-2.5 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-400 outline-none transition"
                       />
-                      <Phone className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                      <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                     </div>
                   </div>
                 </>
               )}
 
               <div>
-                <label className="text-[11px] font-bold text-slate-400 block mb-1">
+                <label className="text-[11px] font-bold text-slate-700 block mb-1">
                   Email Address
                 </label>
                 <div className="relative">
@@ -320,15 +315,15 @@ export const Login = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="name@domain.com"
-                    className="w-full bg-[#19191d] border border-white/10 focus:border-[#e11938] rounded-xl py-2.5 pl-9 pr-3 text-xs text-white placeholder-slate-500 outline-none transition"
+                    className="w-full bg-slate-50 hover:bg-slate-50/80 focus:bg-white border border-slate-200 focus:border-[#e11938] focus:ring-3 focus:ring-[#e11938]/10 rounded-xl py-2.5 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-400 outline-none transition"
                   />
-                  <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                 </div>
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-[11px] font-bold text-slate-400">
+                  <label className="text-[11px] font-bold text-slate-700">
                     Password
                   </label>
                   {!isRegister && (
@@ -349,13 +344,13 @@ export const Login = () => {
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     placeholder="At least 6 characters"
-                    className="w-full bg-[#19191d] border border-white/10 focus:border-[#e11938] rounded-xl py-2.5 pl-9 pr-9 text-xs text-white placeholder-slate-500 outline-none transition"
+                    className="w-full bg-slate-50 hover:bg-slate-50/80 focus:bg-white border border-slate-200 focus:border-[#e11938] focus:ring-3 focus:ring-[#e11938]/10 rounded-xl py-2.5 pl-9 pr-9 text-xs text-slate-900 placeholder-slate-400 outline-none transition"
                   />
-                  <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300 cursor-pointer"
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -365,7 +360,7 @@ export const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-3 py-3 rounded-full bg-[#e11938] hover:bg-[#be123c] text-white text-xs font-black uppercase tracking-wider transition-all shadow-[0_4px_16px_rgba(225,25,56,0.4)] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+                className="w-full mt-3 py-3 rounded-full bg-[#e11938] hover:bg-[#be123c] text-white text-xs font-black uppercase tracking-wider transition-all shadow-[0_4px_16px_rgba(225,25,56,0.25)] hover:shadow-[0_6px_20px_rgba(225,25,56,0.35)] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
               >
                 {loading ? 'Processing...' : isRegister ? 'Create Account' : 'Sign In with Email'}
               </button>
@@ -374,15 +369,15 @@ export const Login = () => {
         )}
       </div>
 
-      {/* Bottom Legal Disclaimer (Exact Match to SparkAI Screenshot) */}
+      {/* Bottom Legal Disclaimer (SparkAI Style) */}
       <div className="w-full max-w-sm mx-auto text-center relative z-10 pb-2">
         <p className="text-[11px] sm:text-xs text-slate-500 leading-relaxed">
           By continuing, you agree to our{' '}
-          <Link to="/" className="text-slate-400 hover:text-white underline transition">
+          <Link to="/" className="text-slate-700 hover:text-slate-900 underline font-medium transition">
             Terms of Service
           </Link>{' '}
           and{' '}
-          <Link to="/" className="text-slate-400 hover:text-white underline transition">
+          <Link to="/" className="text-slate-700 hover:text-slate-900 underline font-medium transition">
             Privacy Policy
           </Link>
           .
@@ -391,30 +386,30 @@ export const Login = () => {
 
       {/* Forgot Password Helper Modal */}
       {showForgotModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-[#121215] border border-white/10 rounded-3xl p-6 max-w-sm w-full text-slate-200 relative shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 max-w-sm w-full text-slate-900 relative shadow-2xl">
             <button
               onClick={() => {
                 setShowForgotModal(false);
                 setForgotSent(false);
                 setForgotEmail('');
               }}
-              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-full bg-white/5 transition"
+              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100 transition"
             >
               <X className="w-4 h-4" />
             </button>
 
-            <h3 className="text-base font-black text-white mb-1.5">Reset Your Password</h3>
-            <p className="text-xs text-slate-400 mb-4 leading-relaxed">
+            <h3 className="text-base font-black text-slate-900 mb-1.5">Reset Your Password</h3>
+            <p className="text-xs text-slate-500 mb-4 leading-relaxed">
               Enter your registered account email. We'll send a secure password reset link.
             </p>
 
             {forgotSent ? (
-              <div className="p-4 bg-emerald-950/60 border border-emerald-500/30 rounded-2xl flex items-start gap-3 text-emerald-300">
-                <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-400" />
+              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-3 text-emerald-800">
+                <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" />
                 <div className="text-xs">
-                  <p className="font-bold text-white">Reset link dispatched</p>
-                  <p className="mt-0.5 text-slate-300">Check inbox at <strong className="text-white">{forgotEmail}</strong>.</p>
+                  <p className="font-bold text-slate-900">Reset link dispatched</p>
+                  <p className="mt-0.5 text-slate-600">Check inbox at <strong className="text-slate-900">{forgotEmail}</strong>.</p>
                 </div>
               </div>
             ) : (
@@ -425,7 +420,7 @@ export const Login = () => {
                   value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="w-full bg-[#18181c] border border-white/10 focus:border-[#e11938] rounded-xl py-2.5 px-3 text-xs text-white placeholder-slate-500 outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-[#e11938] rounded-xl py-2.5 px-3 text-xs text-slate-900 placeholder-slate-400 outline-none"
                 />
                 <button
                   type="submit"
