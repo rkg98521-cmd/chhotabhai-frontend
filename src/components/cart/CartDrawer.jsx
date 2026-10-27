@@ -76,10 +76,10 @@ export const CartDrawer = () => {
         className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity duration-300"
       />
 
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-white border-l border-slate-200 text-slate-900 shadow-2xl flex flex-col justify-between animate-slide-in-right">
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10 w-full sm:w-auto justify-end">
+        <div className="w-full sm:w-[420px] max-w-full sm:max-w-md bg-white border-l border-slate-200 text-slate-900 shadow-2xl flex flex-col justify-between animate-slide-in-right">
           {/* Header */}
-          <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-white">
+          <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-white">
             <div className="flex items-center gap-2">
               <ShoppingBag className="w-5 h-5 text-brand-red" />
               <h2 className="text-base font-black uppercase tracking-wider text-slate-900">
@@ -95,7 +95,7 @@ export const CartDrawer = () => {
           </div>
 
           {/* Free Shipping Milestone Indicator */}
-          <div className="bg-slate-50 px-5 py-3 border-b border-slate-100">
+          <div className="bg-slate-50 px-4 sm:px-5 py-3 border-b border-slate-100">
             <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
               <span className="flex items-center gap-1.5 text-slate-700">
                 <Truck className="w-3.5 h-3.5 text-brand-red" />
@@ -118,7 +118,7 @@ export const CartDrawer = () => {
           </div>
 
           {/* Cart Items List */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
             {items.length === 0 ? (
               <div className="py-20 text-center space-y-4">
                 <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
@@ -143,7 +143,7 @@ export const CartDrawer = () => {
               items.map((item) => (
                 <div
                   key={item.variantSku}
-                  className="bg-white border border-slate-200 rounded-2xl p-3.5 flex gap-3.5 items-center relative group shadow-sm hover:border-slate-300 transition-colors"
+                  className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 flex gap-3 items-center relative group shadow-sm hover:border-slate-300 transition-colors"
                 >
                   <img
                     src={item.image || 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=200&auto=format&fit=crop&q=80'}
@@ -187,7 +187,7 @@ export const CartDrawer = () => {
                   </div>
 
                   {/* Quantity Actions */}
-                  <div className="flex flex-col items-end gap-2">
+                  <div className="flex flex-col items-end gap-2 shrink-0">
                     <button
                       onClick={() => removeCartItem(item.variantSku)}
                       className="text-slate-400 hover:text-brand-red transition-colors p-1"
@@ -219,7 +219,7 @@ export const CartDrawer = () => {
 
           {/* Bottom Pricing Summary & Checkout Block */}
           {items.length > 0 && (
-            <div className="p-5 border-t border-slate-200 bg-slate-50 space-y-4">
+            <div className="p-4 sm:p-5 border-t border-slate-200 bg-slate-50 space-y-4">
               {/* Coupon Bar */}
               <div className="space-y-1.5">
                 {appliedCoupon ? (
@@ -236,7 +236,7 @@ export const CartDrawer = () => {
                   </div>
                 ) : (
                   <form onSubmit={handleApplyCoupon} className="flex gap-2">
-                    <div className="relative flex-1">
+                    <div className="relative flex-1 min-w-0">
                       <input
                         type="text"
                         value={couponInput}
@@ -249,7 +249,7 @@ export const CartDrawer = () => {
                     <button
                       type="submit"
                       disabled={couponLoading || !couponInput.trim()}
-                      className="px-4 py-2 bg-slate-900 hover:bg-brand-red text-white text-xs font-bold rounded-xl uppercase transition-colors disabled:opacity-50"
+                      className="px-4 py-2 bg-slate-900 hover:bg-brand-red text-white text-xs font-bold rounded-xl uppercase transition-colors disabled:opacity-50 shrink-0"
                     >
                       {couponLoading ? '...' : 'Apply'}
                     </button>
