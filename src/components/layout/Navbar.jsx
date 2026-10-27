@@ -287,16 +287,16 @@ export const Navbar = () => {
               title="Search Products"
               aria-label="Search"
             >
-              <Search className="w-5 h-5 text-slate-800" strokeWidth={2} />
+              <Search className="w-5 h-5 text-slate-800" strokeWidth={1.8} />
             </button>
 
             {/* User Account Action - Pure Avatar Circle (Identical size w-9 h-9 sm:w-10 sm:h-10) */}
-            <div ref={userDropdownRef} className="relative flex items-center">
+            <div ref={userDropdownRef} className="relative flex items-center shrink-0">
               {isAuthenticated ? (
                 <div className="relative flex items-center">
                   <button
                     onClick={() => setUserDropdown(!userDropdown)}
-                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:opacity-90 transition cursor-pointer focus:outline-none shrink-0"
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-slate-100 flex items-center justify-center transition cursor-pointer focus:outline-none shrink-0"
                     title="Account Profile"
                     aria-label="User Account"
                   >
@@ -305,10 +305,10 @@ export const Navbar = () => {
                         src={user.avatar}
                         alt={user?.name || 'User Profile'}
                         referrerPolicy="no-referrer"
-                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-purple-500/80 shadow-2xs"
+                        className="w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-full object-cover ring-1 ring-slate-300"
                       />
                     ) : (
-                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 text-white text-xs sm:text-[13px] font-black flex items-center justify-center shadow-xs">
+                      <div className="w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-full bg-slate-900 text-white text-[11px] sm:text-xs font-bold flex items-center justify-center shadow-xs">
                         {user?.name ? user.name.trim().charAt(0).toUpperCase() : 'U'}
                       </div>
                     )}
@@ -322,10 +322,10 @@ export const Navbar = () => {
                             src={user.avatar}
                             alt={user.name}
                             referrerPolicy="no-referrer"
-                            className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-200 shrink-0"
+                            className="w-7 h-7 rounded-full object-cover ring-1 ring-slate-200 shrink-0"
                           />
                         ) : (
-                          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 text-white text-xs font-black flex items-center justify-center shrink-0">
+                          <div className="w-7 h-7 rounded-full bg-slate-900 text-white text-xs font-black flex items-center justify-center shrink-0">
                             {user?.name ? user.name.trim().charAt(0).toUpperCase() : 'U'}
                           </div>
                         )}
@@ -379,11 +379,11 @@ export const Navbar = () => {
               ) : (
                 <Link
                   to="/login"
-                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition shrink-0"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-800 transition cursor-pointer focus:outline-none shrink-0"
                   title="Sign In"
                   aria-label="Sign In"
                 >
-                  <UserIcon className="w-5 h-5 text-slate-700" strokeWidth={2} />
+                  <UserIcon className="w-5 h-5 text-slate-800" strokeWidth={1.8} />
                 </Link>
               )}
             </div>
