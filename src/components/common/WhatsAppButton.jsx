@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 
 /**
  * @file WhatsAppButton.jsx
@@ -6,6 +7,10 @@ import React from 'react';
  * Opens WhatsApp Chat with pre-filled message directly via https://wa.me/
  */
 export const WhatsAppButton = () => {
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+  if (isAuthPage) return null;
+
   const rawNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '9852124942';
   // Normalize phone number to 91XXXXXXXXXX
   const digitsOnly = String(rawNumber).replace(/\D/g, '');

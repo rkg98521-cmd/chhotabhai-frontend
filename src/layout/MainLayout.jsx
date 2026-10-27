@@ -1,11 +1,22 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import CartDrawer from '../components/cart/CartDrawer';
 import MobileBottomNav from '../components/layout/MobileBottomNav';
 
 export const MainLayout = () => {
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+
+  if (isAuthPage) {
+    return (
+      <div className="min-h-screen bg-[#070709] text-white selection:bg-[#e11938] selection:text-white">
+        <Outlet />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-slate-900 selection:bg-brand-red selection:text-white">
       <Navbar />

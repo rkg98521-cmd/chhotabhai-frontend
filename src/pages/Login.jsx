@@ -5,15 +5,13 @@ import {
   Mail,
   User,
   Phone,
+  ArrowLeft,
   ArrowRight,
   Eye,
   EyeOff,
   AlertCircle,
-  ShieldCheck,
   CheckCircle2,
-  HelpCircle,
-  X,
-  MessageCircle
+  X
 } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuthStore } from '../store/useStore';
@@ -21,34 +19,20 @@ import { useAuthStore } from '../store/useStore';
 export const Login = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Mode: 'splash' (SparkAI-style 2-button screen) or 'email' (Email/Password form)
+  const [viewMode, setViewMode] = useState('splash');
   const [isRegister, setIsRegister] = useState(location.pathname === '/register');
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotSent, setForgotSent] = useState(false);
 
-  // Dynamically calculate Google button width to prevent overflow on small mobile screens
-  const [googleWidth, setGoogleWidth] = useState('320');
-
+  // Sync route /register vs /login
   useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      if (width < 360) {
-        setGoogleWidth('270');
-      } else if (width < 420) {
-        setGoogleWidth('300');
-      } else {
-        setGoogleWidth('340');
-      }
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    setIsRegister(location.pathname === '/register');
+    if (location.pathname === '/register') {
+      setIsRegister(true);
+    }
   }, [location.pathname]);
 
   const [formData, setFormData] = useState({
@@ -98,11 +82,6 @@ export const Login = () => {
     console.error('Google Sign-In Failed');
   };
 
-  const toggleAuthMode = (registerMode) => {
-    setIsRegister(registerMode);
-    navigate(registerMode ? '/register' : '/login', { replace: true });
-  };
-
   const handleForgotSubmit = (e) => {
     e.preventDefault();
     if (!forgotEmail) return;
@@ -110,287 +89,350 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-140px)] flex items-center justify-center pt-4 pb-28 sm:py-12 px-4 bg-gradient-to-b from-slate-50 via-white to-slate-100 relative">
+    <div className="min-h-screen bg-[#070709] text-white flex flex-col justify-between px-6 py-8 sm:py-12 relative overflow-hidden select-none font-sans">
       
-      {/* Decorative ambient background glows */}
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-80 h-80 bg-red-100/40 rounded-full blur-3xl pointer-events-none -z-0" />
-      <div className="absolute bottom-10 right-10 w-64 h-64 bg-slate-200/50 rounded-full blur-3xl pointer-events-none -z-0" />
+      {/* Ambient background glows for ultra-premium depth */}
+      <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-[#e11938]/12 rounded-full blur-[140px] pointer-events-none -z-0" />
+      <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[420px] h-[420px] bg-red-950/20 rounded-full blur-[120px] pointer-events-none -z-0" />
 
-      {/* Main Authentication Card */}
-      <div className="w-full max-w-[430px] bg-white rounded-3xl border border-slate-200/90 shadow-[0_12px_40px_-10px_rgba(0,0,0,0.08)] p-6 sm:p-8 relative z-10 transition-all">
+      {/* Top Header Row with Close Button */}
+      <div className="w-full max-w-md mx-auto flex items-center justify-between relative z-10">
+        <Link to="/" className="inline-flex items-center gap-1.5 opacity-80 hover:opacity-100 transition">
+          <span className="text-sm font-bold tracking-tight text-white/60">
+            Storefront
+          </span>
+        </Link>
+
+        <Link
+          to="/"
+          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition cursor-pointer"
+          title="Close & return to store"
+          aria-label="Close"
+        >
+          <X className="w-4 h-4 sm:w-5 sm:h-5" />
+        </Link>
+      </div>
+
+      {/* Center Branding Area (Exact Match to SparkAI Layout) */}
+      <div className="w-full max-w-sm sm:max-w-md mx-auto flex flex-col items-center text-center my-auto py-8 relative z-10">
         
-        {/* Header Branding */}
-        <div className="text-center space-y-1.5 mb-5">
-          <Link to="/" className="inline-block group focus:outline-none">
-            <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-sans">
-              Chhota<span className="text-[#e11938]">Bhai</span>
-            </span>
-          </Link>
-          <p className="text-xs text-slate-500 font-medium max-w-xs mx-auto">
-            {isRegister
-              ? 'Create an account to track orders & unlock exclusive member deals'
-              : 'Sign in to access your orders, cart & saved delivery addresses'}
-          </p>
+        {/* App Logo Squircle Icon with 3D Glass Depth */}
+        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[26px] bg-gradient-to-b from-[#222228] via-[#151518] to-[#0a0a0c] border border-white/15 shadow-[0_16px_40px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.25)] flex items-center justify-center relative p-3 group transition-transform duration-300 hover:scale-105">
+          {/* Subtle top reflection sheen */}
+          <div className="absolute top-0 inset-x-0 h-1/2 bg-gradient-to-b from-white/15 to-transparent rounded-t-[26px] pointer-events-none" />
+
+          {/* Glowing Brand 3D Ribbon Monogram */}
+          <svg
+            viewBox="0 0 64 64"
+            className="w-12 h-12 sm:w-14 sm:h-14 filter drop-shadow-[0_4px_16px_rgba(225,25,56,0.65)]"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <linearGradient id="cbGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ffffff" />
+                <stop offset="45%" stopColor="#f43f5e" />
+                <stop offset="100%" stopColor="#e11938" />
+              </linearGradient>
+              <linearGradient id="cbGradDark" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#e11938" />
+                <stop offset="100%" stopColor="#881337" />
+              </linearGradient>
+            </defs>
+
+            {/* Futuristic Interlocking Sound & Shield Loops */}
+            <path
+              d="M32 10C21 10 12 19 12 30C12 37 16 43 22 46.5L25 41C20.5 38.5 18 34.5 18 30C18 22.5 24.5 16 32 16C39.5 16 46 22.5 46 30C46 34.5 43.5 38.5 39 41L42 46.5C48 43 52 37 52 30C52 19 43 10 32 10Z"
+              fill="url(#cbGrad)"
+            />
+            <path
+              d="M32 22C27.5 22 24 25.5 24 30C24 33.5 26 36.5 29 38L32 32.5L35 38C38 36.5 40 33.5 40 30C40 25.5 36.5 22 32 22Z"
+              fill="#ffffff"
+            />
+            {/* Center Dynamic Bass Core */}
+            <circle cx="32" cy="48" r="5" fill="#e11938" />
+            <circle cx="32" cy="48" r="2.5" fill="#ffffff" />
+          </svg>
         </div>
 
-        {/* Auth Mode Switcher Tabs */}
-        <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-2xl mb-5">
-          <button
-            type="button"
-            onClick={() => toggleAuthMode(false)}
-            className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-              !isRegister
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            Sign In
-          </button>
-          <button
-            type="button"
-            onClick={() => toggleAuthMode(true)}
-            className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-              isRegister
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            Create Account
-          </button>
-        </div>
+        {/* Brand Name Title */}
+        <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mt-5 select-none font-sans">
+          Chhota<span className="text-[#e11938]">Bhai</span>
+        </h1>
 
-        {/* Error Alert */}
+        {/* Project Tagline Subtitle */}
+        <p className="text-xs sm:text-sm text-slate-400 font-medium tracking-wide mt-1.5">
+          Smart Mobile Audio & Gear
+        </p>
+
+        {/* Global Error Display */}
         {error && (
-          <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-2.5 text-rose-700 animate-in fade-in duration-200">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
-            <p className="text-xs font-semibold leading-relaxed">{error}</p>
+          <div className="mt-5 w-full p-3 bg-red-950/70 border border-red-500/30 rounded-2xl flex items-center justify-center gap-2 text-rose-300 text-xs animate-in fade-in duration-200">
+            <AlertCircle className="w-4 h-4 shrink-0 text-[#e11938]" />
+            <span>{error}</span>
           </div>
         )}
 
-        {/* Google Login Section - Sized responsively to never clip or squish */}
-        <div className="space-y-3">
-          <div className="w-full flex justify-center items-center overflow-hidden min-h-[44px]">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-              shape="rectangular"
-              theme="outline"
-              size="large"
-              text={isRegister ? 'signup_with' : 'signin_with'}
-              width={googleWidth}
-              logo_alignment="left"
-            />
-          </div>
-
-          <div className="relative flex items-center py-1">
-            <div className="flex-grow border-t border-slate-200"></div>
-            <span className="flex-shrink mx-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Or continue with email
-            </span>
-            <div className="flex-grow border-t border-slate-200"></div>
-          </div>
-        </div>
-
-        {/* Standard Email/Password Form */}
-        <form onSubmit={handleSubmit} className="space-y-3.5">
-          {isRegister && (
-            <>
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    required
-                    autoComplete="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="e.g. Rohit Kumar"
-                    className="w-full bg-slate-50/80 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-[#e11938] focus:ring-3 focus:ring-[#e11938]/10 rounded-xl py-2.5 pl-10 pr-4 text-xs font-medium text-slate-900 placeholder-slate-400 outline-none transition"
-                  />
-                  <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                </div>
+        {/* =========================================================================
+            VIEW 1: SPARK-AI STYLE MINIMALIST 2-BUTTON LANDING SCREEN (Default)
+        ========================================================================= */}
+        {viewMode === 'splash' && (
+          <div className="w-full mt-8 sm:mt-10 space-y-3.5 animate-in fade-in duration-200">
+            
+            {/* Primary Action 1: Continue with Google (Pill) */}
+            <div className="relative w-full h-13 sm:h-14 rounded-full bg-[#151518] hover:bg-[#1d1d22] border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.6)] flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer overflow-hidden group active:scale-[0.99]">
+              
+              {/* Invisible GoogleLogin overlay catching clicks natively */}
+              <div className="absolute inset-0 opacity-0 z-20 flex items-center justify-center overflow-hidden cursor-pointer scale-125">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  shape="pill"
+                  size="large"
+                  width="400"
+                />
               </div>
 
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Phone Number <span className="text-slate-400 font-normal">(Optional)</span>
-                </label>
-                <div className="relative">
-                  <input
-                    type="tel"
-                    autoComplete="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="10-digit mobile number"
-                    className="w-full bg-slate-50/80 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-[#e11938] focus:ring-3 focus:ring-[#e11938]/10 rounded-xl py-2.5 pl-10 pr-4 text-xs font-medium text-slate-900 placeholder-slate-400 outline-none transition"
-                  />
-                  <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                </div>
-              </div>
-            </>
-          )}
+              {/* Official 4-color Google G Icon */}
+              <svg className="w-5 h-5 shrink-0 relative z-10" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                />
+              </svg>
 
-          <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1">
-              Email Address
-            </label>
-            <div className="relative">
-              <input
-                type="email"
-                required
-                autoComplete="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="name@domain.com"
-                className="w-full bg-slate-50/80 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-[#e11938] focus:ring-3 focus:ring-[#e11938]/10 rounded-xl py-2.5 pl-10 pr-4 text-xs font-medium text-slate-900 placeholder-slate-400 outline-none transition"
-              />
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              <span className="text-white text-sm sm:text-base font-semibold tracking-wide relative z-10">
+                Continue with Google
+              </span>
             </div>
-          </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-bold text-slate-700">
-                Password
-              </label>
-              {!isRegister && (
+            {/* Primary Action 2: Continue with email (Pill) */}
+            <button
+              type="button"
+              onClick={() => setViewMode('email')}
+              className="w-full h-13 sm:h-14 rounded-full bg-[#151518] hover:bg-[#1d1d22] border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.6)] flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer active:scale-[0.99]"
+            >
+              <Mail className="w-5 h-5 text-slate-300 shrink-0" />
+              <span className="text-white text-sm sm:text-base font-semibold tracking-wide">
+                Continue with email
+              </span>
+            </button>
+          </div>
+        )}
+
+        {/* =========================================================================
+            VIEW 2: EMAIL / PASSWORD EXPANDED FORM (When user clicks Continue with email)
+        ========================================================================= */}
+        {viewMode === 'email' && (
+          <div className="w-full mt-6 bg-[#121215] border border-white/10 rounded-3xl p-5 sm:p-6 text-left shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            
+            {/* Back Button & Switcher Header */}
+            <div className="flex items-center justify-between mb-4">
+              <button
+                type="button"
+                onClick={() => setViewMode('splash')}
+                className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" /> Back
+              </button>
+
+              <div className="flex p-0.5 bg-black/40 border border-white/5 rounded-xl">
                 <button
                   type="button"
-                  onClick={() => setShowForgotModal(true)}
-                  className="text-[11px] font-semibold text-[#e11938] hover:underline cursor-pointer"
+                  onClick={() => setIsRegister(false)}
+                  className={`px-3 py-1 text-xs font-bold rounded-lg transition cursor-pointer ${
+                    !isRegister ? 'bg-[#e11938] text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                  }`}
                 >
-                  Forgot Password?
+                  Sign In
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setIsRegister(true)}
+                  className={`px-3 py-1 text-xs font-bold rounded-lg transition cursor-pointer ${
+                    isRegister ? 'bg-[#e11938] text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Register
+                </button>
+              </div>
+            </div>
+
+            {/* Email Form */}
+            <form onSubmit={handleSubmit} className="space-y-3">
+              {isRegister && (
+                <>
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-400 block mb-1">
+                      Full Name
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        required
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="e.g. Rohit Kumar"
+                        className="w-full bg-[#19191d] border border-white/10 focus:border-[#e11938] rounded-xl py-2.5 pl-9 pr-3 text-xs text-white placeholder-slate-500 outline-none transition"
+                      />
+                      <User className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-400 block mb-1">
+                      Phone Number <span className="text-slate-500 font-normal">(Optional)</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        placeholder="10-digit mobile number"
+                        className="w-full bg-[#19191d] border border-white/10 focus:border-[#e11938] rounded-xl py-2.5 pl-9 pr-3 text-xs text-white placeholder-slate-500 outline-none transition"
+                      />
+                      <Phone className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                    </div>
+                  </div>
+                </>
               )}
-            </div>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                required
-                minLength={6}
-                autoComplete={isRegister ? 'new-password' : 'current-password'}
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                placeholder="At least 6 characters"
-                className="w-full bg-slate-50/80 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-[#e11938] focus:ring-3 focus:ring-[#e11938]/10 rounded-xl py-2.5 pl-10 pr-10 text-xs font-medium text-slate-900 placeholder-slate-400 outline-none transition"
-              />
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 p-0.5 text-slate-400 hover:text-slate-600 transition cursor-pointer"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-          </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full mt-3 py-3.5 bg-gradient-to-r from-[#e11938] to-[#c4142f] hover:from-[#c4142f] hover:to-[#a81026] active:scale-[0.99] text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-[0_4px_16px_rgba(225,25,56,0.28)] hover:shadow-[0_6px_20px_rgba(225,25,56,0.36)] disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
-          >
-            {loading ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                <span>{isRegister ? 'Create Account' : 'Sign In'}</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
-          </button>
-        </form>
-
-        {/* Security & SSL Trust Badge */}
-        <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-center gap-1.5 text-[11px] font-medium text-slate-400 text-center">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-          <span>256-bit SSL encrypted • Official Authentic Store</span>
-        </div>
-      </div>
-
-      {/* Forgot Password Modal */}
-      {showForgotModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            onClick={() => setShowForgotModal(false)}
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity animate-in fade-in"
-          />
-          <div className="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 z-10 animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-              <div className="flex items-center gap-2">
-                <HelpCircle className="w-5 h-5 text-[#e11938]" />
-                <h3 className="font-bold text-sm text-slate-900">Reset Your Password</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowForgotModal(false)}
-                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {forgotSent ? (
-              <div className="text-center py-4 space-y-3">
-                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
-                <h4 className="font-bold text-sm text-slate-900">Reset Request Received</h4>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  If an account exists for <span className="font-semibold text-slate-800">{forgotEmail}</span>, recovery instructions will be sent shortly.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForgotModal(false);
-                    setForgotSent(false);
-                    setForgotEmail('');
-                  }}
-                  className="w-full py-2.5 bg-slate-900 text-white font-bold text-xs rounded-xl hover:bg-slate-800 cursor-pointer"
-                >
-                  Back to Sign In
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleForgotSubmit} className="space-y-4">
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Enter your registered email address and we'll help you regain access, or connect with our support team on WhatsApp.
-                </p>
-                <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">
-                    Your Email
-                  </label>
+              <div>
+                <label className="text-[11px] font-bold text-slate-400 block mb-1">
+                  Email Address
+                </label>
+                <div className="relative">
                   <input
                     type="email"
                     required
-                    value={forgotEmail}
-                    onChange={(e) => setForgotEmail(e.target.value)}
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="name@domain.com"
-                    className="w-full bg-slate-50 focus:bg-white border border-slate-200 focus:border-[#e11938] rounded-xl py-2 px-3 text-xs font-medium text-slate-900 outline-none"
+                    className="w-full bg-[#19191d] border border-white/10 focus:border-[#e11938] rounded-xl py-2.5 pl-9 pr-3 text-xs text-white placeholder-slate-500 outline-none transition"
                   />
+                  <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
                 </div>
-                <div className="space-y-2 pt-1">
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[11px] font-bold text-slate-400">
+                    Password
+                  </label>
+                  {!isRegister && (
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotModal(true)}
+                      className="text-[10px] font-semibold text-[#e11938] hover:underline cursor-pointer"
+                    >
+                      Forgot?
+                    </button>
+                  )}
+                </div>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    minLength={6}
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    placeholder="At least 6 characters"
+                    className="w-full bg-[#19191d] border border-white/10 focus:border-[#e11938] rounded-xl py-2.5 pl-9 pr-9 text-xs text-white placeholder-slate-500 outline-none transition"
+                  />
+                  <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
                   <button
-                    type="submit"
-                    className="w-full py-2.5 bg-[#e11938] hover:bg-[#c4142f] text-white font-bold text-xs rounded-xl cursor-pointer"
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300 cursor-pointer"
                   >
-                    Request Password Reset
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
-                  <a
-                    href="https://wa.me/919852124942?text=Hi%20ChhotaBhai%2C%20I%20need%20help%20resetting%20my%20account%20password."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer"
-                  >
-                    <MessageCircle className="w-3.5 h-3.5" />
-                    <span>Instant Help via WhatsApp</span>
-                  </a>
                 </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-3 py-3 rounded-full bg-[#e11938] hover:bg-[#be123c] text-white text-xs font-black uppercase tracking-wider transition-all shadow-[0_4px_16px_rgba(225,25,56,0.4)] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+              >
+                {loading ? 'Processing...' : isRegister ? 'Create Account' : 'Sign In with Email'}
+              </button>
+            </form>
+          </div>
+        )}
+      </div>
+
+      {/* Bottom Legal Disclaimer (Exact Match to SparkAI Screenshot) */}
+      <div className="w-full max-w-sm mx-auto text-center relative z-10 pb-2">
+        <p className="text-[11px] sm:text-xs text-slate-500 leading-relaxed">
+          By continuing, you agree to our{' '}
+          <Link to="/" className="text-slate-400 hover:text-white underline transition">
+            Terms of Service
+          </Link>{' '}
+          and{' '}
+          <Link to="/" className="text-slate-400 hover:text-white underline transition">
+            Privacy Policy
+          </Link>
+          .
+        </p>
+      </div>
+
+      {/* Forgot Password Helper Modal */}
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-[#121215] border border-white/10 rounded-3xl p-6 max-w-sm w-full text-slate-200 relative shadow-2xl">
+            <button
+              onClick={() => {
+                setShowForgotModal(false);
+                setForgotSent(false);
+                setForgotEmail('');
+              }}
+              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-full bg-white/5 transition"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <h3 className="text-base font-black text-white mb-1.5">Reset Your Password</h3>
+            <p className="text-xs text-slate-400 mb-4 leading-relaxed">
+              Enter your registered account email. We'll send a secure password reset link.
+            </p>
+
+            {forgotSent ? (
+              <div className="p-4 bg-emerald-950/60 border border-emerald-500/30 rounded-2xl flex items-start gap-3 text-emerald-300">
+                <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-400" />
+                <div className="text-xs">
+                  <p className="font-bold text-white">Reset link dispatched</p>
+                  <p className="mt-0.5 text-slate-300">Check inbox at <strong className="text-white">{forgotEmail}</strong>.</p>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotSubmit} className="space-y-3">
+                <input
+                  type="email"
+                  required
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="w-full bg-[#18181c] border border-white/10 focus:border-[#e11938] rounded-xl py-2.5 px-3 text-xs text-white placeholder-slate-500 outline-none"
+                />
+                <button
+                  type="submit"
+                  className="w-full py-2.5 bg-[#e11938] hover:bg-[#be123c] text-white text-xs font-bold uppercase rounded-xl transition shadow-md"
+                >
+                  Send Reset Link
+                </button>
               </form>
             )}
           </div>
