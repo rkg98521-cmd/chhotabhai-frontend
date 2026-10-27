@@ -145,10 +145,10 @@ export const Navbar = () => {
             {/* Mobile Hamburger 3-Lines Menu Toggle (Before Logo) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 -ml-1.5 lg:hidden text-slate-800 hover:bg-slate-100 rounded-xl transition cursor-pointer"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center lg:hidden text-slate-800 hover:bg-slate-100 transition cursor-pointer -ml-1"
               aria-label="Toggle menu"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
             {/* ChhotaBhai Logo */}
@@ -279,24 +279,24 @@ export const Navbar = () => {
               </div>
             </div>
 
-            {/* boAt Mobile Search Button */}
+            {/* boAt Mobile Search Button (Identical size w-9 h-9 sm:w-10 sm:h-10) */}
             <button
               type="button"
               onClick={() => setSearchModalOpen(true)}
-              className="p-2 hover:bg-slate-100 rounded-full transition text-slate-800 cursor-pointer focus:outline-none md:hidden"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-slate-100 flex items-center justify-center transition text-slate-800 cursor-pointer focus:outline-none shrink-0 md:hidden"
               title="Search Products"
               aria-label="Search"
             >
               <Search className="w-5 h-5 text-slate-800" strokeWidth={2} />
             </button>
 
-            {/* User Account Action - Pure Avatar Circle (No down arrow, no extra pill space) */}
+            {/* User Account Action - Pure Avatar Circle (Identical size w-9 h-9 sm:w-10 sm:h-10) */}
             <div ref={userDropdownRef} className="relative flex items-center">
               {isAuthenticated ? (
                 <div className="relative flex items-center">
                   <button
                     onClick={() => setUserDropdown(!userDropdown)}
-                    className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-90 transition cursor-pointer focus:outline-none shrink-0"
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:opacity-90 transition cursor-pointer focus:outline-none shrink-0"
                     title="Account Profile"
                     aria-label="User Account"
                   >
@@ -305,17 +305,17 @@ export const Navbar = () => {
                         src={user.avatar}
                         alt={user?.name || 'User Profile'}
                         referrerPolicy="no-referrer"
-                        className="w-8 h-8 rounded-full object-cover ring-2 ring-purple-500/80 shadow-2xs"
+                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-purple-500/80 shadow-2xs"
                       />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 text-white text-xs font-black flex items-center justify-center shadow-xs">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 text-white text-xs sm:text-[13px] font-black flex items-center justify-center shadow-xs">
                         {user?.name ? user.name.trim().charAt(0).toUpperCase() : 'U'}
                       </div>
                     )}
                   </button>
 
                   {userDropdown && (
-                    <div className="absolute right-0 top-11 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in duration-150">
+                    <div className="absolute right-0 top-12 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in duration-150">
                       <div className="px-4 py-3 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
                         {user?.avatar ? (
                           <img
@@ -379,25 +379,25 @@ export const Navbar = () => {
               ) : (
                 <Link
                   to="/login"
-                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition shrink-0"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition shrink-0"
                   title="Sign In"
                   aria-label="Sign In"
                 >
-                  <UserIcon className="w-4 h-4 text-slate-700" strokeWidth={2} />
+                  <UserIcon className="w-5 h-5 text-slate-700" strokeWidth={2} />
                 </Link>
               )}
             </div>
 
-            {/* Shopping Bag / Cart Action */}
+            {/* Shopping Bag / Cart Action (Identical size w-9 h-9 sm:w-10 sm:h-10) */}
             <button
               onClick={openDrawer}
-              className="p-2 hover:bg-slate-100 rounded-full transition text-slate-800 relative cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-300"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-slate-100 flex items-center justify-center transition text-slate-800 relative cursor-pointer focus:outline-none shrink-0"
               title="View Cart"
               aria-label="Shopping Cart"
             >
-              <ShoppingBag className="w-[21px] h-[21px] text-slate-800" strokeWidth={1.75} />
+              <ShoppingBag className="w-5 h-5 text-slate-800" strokeWidth={1.8} />
               {totalItems > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-[#e11938] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                <span className="absolute -top-1 -right-1 bg-[#e11938] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
                   {totalItems}
                 </span>
               )}
