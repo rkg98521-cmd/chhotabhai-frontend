@@ -11,11 +11,16 @@ import {
   Heart,
   Share2,
   ChevronRight,
+  Shield,
+  Sparkles,
+  Smartphone,
+  Radio,
 } from 'lucide-react';
 import axiosInstance from '../api/axiosInstance';
 import { useCartStore, useAuthStore, useWishlistStore } from '../store/useStore';
 import Meta from '../components/common/Meta';
 import Loader from '../components/Loader';
+import ProductCard from '../components/common/ProductCard';
 
 export const ProductDetail = () => {
   const { slug } = useParams();
@@ -26,6 +31,7 @@ export const ProductDetail = () => {
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [relatedProducts, setRelatedProducts] = useState([]);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedDevice, setSelectedDevice] = useState('');
@@ -44,6 +50,20 @@ export const ProductDetail = () => {
         setSelectedVariantIndex(p.defaultVariantIndex || 0);
         if (p.supportedDevices && p.supportedDevices.length > 0) {
           setSelectedDevice(p.supportedDevices[0]);
+        }
+
+        // Fetch similar / related products
+        try {
+          const relRes = await axiosInstance.get('/products', {
+            params: { limit: 8, category: p.category?.slug || undefined },
+          });
+          const allItems = relRes.data?.data?.products || relRes.data?.products || [];
+          const filtered = allItems
+            .filter((item) => (item.slug || item._id) !== slug)
+            .slice(0, 4);
+          setRelatedProducts(filtered);
+        } catch (relErr) {
+          console.error('Related products fetch error:', relErr);
         }
       } catch (err) {
         console.error('PDP load error:', err);
@@ -143,7 +163,7 @@ export const ProductDetail = () => {
       : defaultSpecifications;
 
   return (
-    <div className="bg-white text-slate-900 pb-16 lg:pb-8 selection:bg-[#e11938] selection:text-white">
+    <div className="bg-white text-slate-900 pb-16 lg:pb-12 selection:bg-[#e11938] selection:text-white">
       {product && (
         <Meta
           title={`${product.title} - ChhotaBhai`}
@@ -153,7 +173,7 @@ export const ProductDetail = () => {
         />
       )}
 
-      {/* 1. BREADCRUMBS - COMPACT */}
+      {/* 1. BREADCRUMBS */}
       <div className="border-b border-slate-100 bg-slate-50/50">
         <div className="cb-container py-2">
           <nav className="flex items-center gap-1.5 text-[11px] text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-none">
@@ -170,13 +190,13 @@ export const ProductDetail = () => {
         </div>
       </div>
 
-      <div className="cb-container pt-4 pb-2 space-y-6">
+      <div className="cb-container pt-4 pb-2 space-y-8">
         {/* 2. MAIN BUYING STAGE: IMAGE & BUY BOX */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
           
           {/* LEFT: Product Gallery */}
           <div className="lg:col-span-6 space-y-2.5">
-            <div className="aspect-square bg-[#f8f9fb] rounded-2xl border border-slate-200 overflow-hidden relative flex items-center justify-center p-4 sm:p-6">
+            <div className="h-[360px] sm:h-[440px] w-full bg-[#f8f9fb] rounded-2xl border border-slate-200 overflow-hidden relative flex items-center justify-center p-4 sm:p-6">
               <img
                 src={activeImage}
                 alt={product.title}
@@ -272,7 +292,7 @@ export const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Price Row (Clean, no excessive card padding) */}
+            {/* Price Row */}
             <div className="py-2 border-y border-slate-100 flex items-baseline gap-3">
               <span className="text-2xl sm:text-3xl font-black text-slate-900">
                 ₹{sellingPrice.toLocaleString('en-IN')}
@@ -442,29 +462,71 @@ export const ProductDetail = () => {
           </div>
         </div>
 
-        {/* 3. PRODUCT DETAILS & SPECIFICATIONS (Clean, compact, no extra fluff) */}
-        <div className="border-t border-slate-200 pt-5 space-y-3">
-          <h2 className="text-base font-black text-slate-900 tracking-tight">
+        {/* 3. PRODUCT DETAILS & SPECIFICATIONS (Fully balanced with Key Features & Specs) */}
+        <div className="border-t border-slate-200 pt-6 space-y-4">
+          <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
             Product Details & Specifications
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
-            {/* Description */}
-            <div className="md:col-span-5 bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs text-slate-600 leading-relaxed whitespace-pre-line">
-              {product.description ||
-                'Precision-crafted protective gear engineered with high-grade optical polycarbonate and shock-absorbing bumpers for maximum daily protection.'}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
+            {/* Left: About & Key Feature Highlights */}
+            <div className="md:col-span-5 bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col justify-between space-y-3.5">
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#e11938]">
+                  About This Product
+                </span>
+                <p className="text-xs text-slate-700 leading-relaxed">
+                  {product.description ||
+                    '100% optical clarity with anti-UV molecular coating that never turns yellow. Features 360-degree shockproof TPU bumpers, 1.8mm raised camera lips, and wireless charging compatibility.'}
+                </p>
+              </div>
+
+              {/* 4 Feature Highlights - Fills the empty space cleanly */}
+              <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-200/80">
+                <div className="p-2 rounded-lg bg-white border border-slate-200/60 flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-[#e11938] shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold text-slate-900 leading-tight">10ft Drop Guard</p>
+                    <p className="text-[9px] text-slate-500">Shockproof Bumpers</p>
+                  </div>
+                </div>
+
+                <div className="p-2 rounded-lg bg-white border border-slate-200/60 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold text-slate-900 leading-tight">Anti-Yellowing</p>
+                    <p className="text-[9px] text-slate-500">UV Molecular Shield</p>
+                  </div>
+                </div>
+
+                <div className="p-2 rounded-lg bg-white border border-slate-200/60 flex items-center gap-2">
+                  <Smartphone className="w-4 h-4 text-blue-600 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold text-slate-900 leading-tight">Tactile Fit</p>
+                    <p className="text-[9px] text-slate-500">1.8mm Raised Lips</p>
+                  </div>
+                </div>
+
+                <div className="p-2 rounded-lg bg-white border border-slate-200/60 flex items-center gap-2">
+                  <Radio className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold text-slate-900 leading-tight">Qi / MagSafe</p>
+                    <p className="text-[9px] text-slate-500">Wireless Ready</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Specifications Table */}
-            <div className="md:col-span-7 bg-white border border-slate-200 rounded-xl overflow-hidden text-xs">
+            {/* Right: Specifications Table */}
+            <div className="md:col-span-7 bg-white border border-slate-200 rounded-xl overflow-hidden text-xs flex flex-col justify-center">
               <table className="w-full">
                 <tbody className="divide-y divide-slate-100">
                   {Object.entries(specificationsToRender).map(([key, val], idx) => (
                     <tr key={key} className={idx % 2 === 0 ? 'bg-slate-50/50' : 'bg-white'}>
-                      <td className="py-2 px-3 font-bold text-slate-500 w-2/5 border-r border-slate-100">
+                      <td className="py-2.5 px-3.5 font-bold text-slate-500 w-2/5 border-r border-slate-100">
                         {key}
                       </td>
-                      <td className="py-2 px-3 font-semibold text-slate-900 w-3/5">
+                      <td className="py-2.5 px-3.5 font-semibold text-slate-900 w-3/5">
                         {val}
                       </td>
                     </tr>
@@ -475,9 +537,37 @@ export const ProductDetail = () => {
           </div>
         </div>
 
+        {/* 4. SIMILAR PRODUCTS (Fills the dead empty bottom space) */}
+        {relatedProducts.length > 0 && (
+          <div className="border-t border-slate-200 pt-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                  You May Also Like
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Popular recommendations matched for your device
+                </p>
+              </div>
+              <Link
+                to="/shop"
+                className="text-xs font-bold text-[#e11938] hover:text-[#be123c] flex items-center gap-1 transition"
+              >
+                View All <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4">
+              {relatedProducts.map((relProduct) => (
+                <ProductCard key={relProduct._id || relProduct.id} product={relProduct} />
+              ))}
+            </div>
+          </div>
+        )}
+
       </div>
 
-      {/* 4. MOBILE STICKY BOTTOM BAR (Both buttons identical size) */}
+      {/* 5. MOBILE STICKY BOTTOM BAR */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-2.5 px-4 z-40 flex items-center justify-between gap-3 shadow-2xl pb-[calc(0.6rem+env(safe-area-inset-bottom,0px))]">
         <div className="min-w-0">
           <div className="text-base font-black text-slate-900 leading-none truncate">
