@@ -112,42 +112,14 @@ export const AuthModal = () => {
           <X className="w-4 h-4" />
         </button>
 
-        {/* ChhotaBhai Brand Logo Squircle */}
-        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100 border border-slate-200/90 shadow-xs flex items-center justify-center mx-auto p-2.5">
-          <svg
-            viewBox="0 0 64 64"
-            className="w-10 h-10 sm:w-11 sm:h-11 filter drop-shadow-[0_2px_8px_rgba(225,25,56,0.3)]"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <linearGradient id="cbModalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#f43f5e" />
-                <stop offset="100%" stopColor="#e11938" />
-              </linearGradient>
-            </defs>
-            <path
-              d="M32 10C21 10 12 19 12 30C12 37 16 43 22 46.5L25 41C20.5 38.5 18 34.5 18 30C18 22.5 24.5 16 32 16C39.5 16 46 22.5 46 30C46 34.5 43.5 38.5 39 41L42 46.5C48 43 52 37 52 30C52 19 43 10 32 10Z"
-              fill="url(#cbModalGrad)"
-            />
-            <path
-              d="M32 22C27.5 22 24 25.5 24 30C24 33.5 26 36.5 29 38L32 32.5L35 38C38 36.5 40 33.5 40 30C40 25.5 36.5 22 32 22Z"
-              fill="#0f172a"
-            />
-            <circle cx="32" cy="48" r="5" fill="#e11938" />
-            <circle cx="32" cy="48" r="2.5" fill="#ffffff" />
-          </svg>
-        </div>
-
-        {/* Headline matching boAt Reference Screen */}
-        <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight mt-3">
-          Welcome! Sign in to avail the best deals!
-        </h3>
-
-        {/* boAt-style Benefit Pill Badge */}
-        <div className="mt-2 inline-flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-full py-1 px-3 text-[11px] font-semibold text-slate-700">
-          <ShieldCheck className="w-3.5 h-3.5 text-[#e11938]" />
-          <span>1 Year Warranty • Instant Prepaid Discounts</span>
+        {/* ChhotaBhai Brand Name (Clean, Premium, No Icon) */}
+        <div className="pt-2">
+          <span className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 font-sans select-none">
+            Chhota<span className="text-[#e11938]">Bhai</span>
+          </span>
+          <p className="text-xs text-slate-500 font-medium mt-1">
+            Sign in to continue
+          </p>
         </div>
 
         {/* Global Error Banner */}
@@ -159,10 +131,10 @@ export const AuthModal = () => {
         )}
 
         {/* =========================================================================
-            MODE 1: SPLASH (SparkAI 2-Button Minimalist View)
+            MODE 1: SPLASH (Simple & Easy 2-Button View)
         ========================================================================= */}
         {mode === 'splash' && (
-          <div className="mt-5 space-y-2.5 animate-in fade-in duration-200">
+          <div className="mt-6 space-y-2.5 animate-in fade-in duration-200">
             {/* Continue with Google */}
             <div className="relative w-full h-12 rounded-full bg-white hover:bg-slate-50 border border-slate-300 shadow-xs hover:shadow-sm flex items-center justify-center gap-2.5 transition active:scale-[0.99] cursor-pointer overflow-hidden group">
               <div className="absolute inset-0 opacity-0 z-20 flex items-center justify-center overflow-hidden cursor-pointer scale-125">
