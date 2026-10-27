@@ -20,9 +20,11 @@ import {
 import { useAuthStore, useCartStore, useFilterStore } from '../../store/useStore';
 import { useDeviceStore } from '../../store/useDeviceStore';
 import axiosInstance from '../../api/axiosInstance';
+import SearchModal from './SearchModal';
 
 export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [categoriesDropdown, setCategoriesDropdown] = useState(false);
   const [moreDropdown, setMoreDropdown] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
@@ -125,6 +127,14 @@ export const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200/90 shadow-xs">
+      {/* TOP ANNOUNCEMENT TICKER (Exact match to boAt Image 2) */}
+      <div className="bg-[#141414] text-white text-[11px] sm:text-xs py-1.5 px-4 text-center font-semibold tracking-wide flex items-center justify-center gap-1.5 border-b border-white/10 select-none">
+        <span>Get additional 5% off on Prepaid Orders | Code: <strong className="text-[#e11938] font-black tracking-wider">CHHOTABHAI</strong></span>
+        <Link to="/shop?filter=crazy-deals" className="underline font-bold hover:text-[#e11938] ml-1 transition-colors">
+          Shop Now
+        </Link>
+      </div>
+
       {/* MAIN HEADER NAVBAR */}
       <div className="cb-container">
         <div className="flex items-center justify-between h-16 sm:h-20 gap-3 xl:gap-5 flex-nowrap">
@@ -241,64 +251,40 @@ export const Navbar = () => {
             </div>
           </nav>
 
-          {/* Right Action Section (Search, Profile, Cart) */}
-          <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
-            {/* Search Bar with live rotating placeholder */}
-            <div ref={searchRef} className="relative hidden md:block">
-              <form onSubmit={handleSearchSubmit} className="relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
-                  placeholder={searchPlaceholders[placeholderIndex]}
-                  className="w-44 md:w-52 lg:w-64 xl:w-72 2xl:w-80 pl-9 pr-8 py-2 bg-[#f0f2f5] hover:bg-[#e9ecf0] focus:bg-white border border-transparent focus:border-[#e11938]/60 rounded-full text-xs sm:text-[13.5px] text-slate-900 placeholder-slate-400 outline-none transition-all duration-200 shadow-2xs"
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearchQuery('');
-                      setSuggestions([]);
-                    }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
-                    aria-label="Clear search"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </form>
-
-              {/* Suggestions Dropdown */}
-              {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-12 left-0 right-0 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 overflow-hidden">
-                  <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-100">
-                    Instant Search Results
-                  </div>
-                  {suggestions.map((p) => (
-                    <Link
-                      key={p._id}
-                      to={`/product/${p.slug}`}
-                      onClick={() => setShowSuggestions(false)}
-                      className="flex items-center gap-3 px-3.5 py-2 hover:bg-slate-50 transition-colors"
-                    >
-                      <img
-                        src={p.thumbnail || p.variants?.[0]?.images?.[0]}
-                        alt={p.title}
-                        className="w-9 h-9 rounded-lg object-cover bg-slate-100 flex-shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-slate-900 truncate">{p.title}</p>
-                        <p className="text-[10px] text-[#e11938] font-bold">
-                          ₹{p.discountedPrice || p.variants?.[0]?.sellingPrice}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
+          {/* Right Action Section (Search, Deals, Profile, Cart - Exact to boAt Image 2) */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            {/* Desktop Search Trigger Bar (Opens boAt SearchModal) */}
+            <div
+              onClick={() => setSearchModalOpen(true)}
+              className="relative hidden md:flex items-center cursor-pointer group"
+              title="Search audio, watches & accessories"
+            >
+              <div className="w-44 md:w-52 lg:w-64 xl:w-72 2xl:w-80 pl-9 pr-4 py-2 bg-[#f0f2f5] hover:bg-[#e9ecf0] border border-transparent rounded-full text-xs sm:text-[13.5px] text-slate-500 transition-all select-none flex items-center shadow-2xs">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none group-hover:text-slate-700 transition-colors" />
+                <span className="truncate">{searchPlaceholders[placeholderIndex]}</span>
+              </div>
             </div>
+
+            {/* boAt Mobile Search Button (Exact to Image 2) */}
+            <button
+              type="button"
+              onClick={() => setSearchModalOpen(true)}
+              className="p-2 hover:bg-slate-100 rounded-full transition text-slate-800 cursor-pointer focus:outline-none md:hidden"
+              title="Search Products"
+              aria-label="Search"
+            >
+              <Search className="w-5 h-5 text-slate-800" strokeWidth={2} />
+            </button>
+
+            {/* boAt Lightning Flash Deals Button (Exact to Image 2) */}
+            <Link
+              to="/shop?filter=crazy-deals"
+              className="p-2 hover:bg-amber-50 rounded-full transition text-amber-500 hover:text-amber-600 cursor-pointer"
+              title="Flash Deals"
+              aria-label="Flash Deals"
+            >
+              <Zap className="w-5 h-5 fill-amber-400 stroke-amber-500" strokeWidth={1.5} />
+            </Link>
 
             {/* User Account Action */}
             <div ref={userDropdownRef} className="relative">
@@ -306,7 +292,7 @@ export const Navbar = () => {
                 <div className="relative">
                   <button
                     onClick={() => setUserDropdown(!userDropdown)}
-                    className="flex items-center gap-2 p-1 pl-1 pr-2 hover:bg-slate-100 rounded-full transition text-slate-800 cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-300 border border-slate-200/80"
+                    className="flex items-center gap-1.5 p-1 pl-1 pr-1.5 sm:pr-2 hover:bg-slate-100 rounded-full transition text-slate-800 cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-300 border border-slate-200/80"
                     title="Account Profile"
                     aria-label="User Account"
                   >
@@ -415,68 +401,11 @@ export const Navbar = () => {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 lg:hidden text-slate-800 hover:bg-slate-100 rounded-xl"
+              aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
-        </div>
-
-        {/* MOBILE HEADER DEDICATED SEARCH BAR (Always visible in mobile header) */}
-        <div ref={mobileSearchRef} className="block md:hidden pb-2.5 pt-0 relative z-20">
-          <form onSubmit={handleSearchSubmit} className="relative w-full">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
-              placeholder={searchPlaceholders[placeholderIndex]}
-              className="w-full pl-9 pr-9 py-2 bg-[#f0f2f5] focus:bg-white border border-slate-200/90 focus:border-[#e11938] rounded-xl text-xs text-slate-900 placeholder-slate-400 outline-none transition-all duration-200 shadow-2xs"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchQuery('');
-                  setSuggestions([]);
-                }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
-                aria-label="Clear search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </form>
-
-          {/* Mobile Auto-Suggestions Dropdown */}
-          {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute top-11 left-0 right-0 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 overflow-hidden">
-              <div className="px-3.5 py-1.5 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-100 flex items-center justify-between">
-                <span>Instant Suggestions</span>
-                <span className="text-[9px] text-[#e11938] font-bold">Tap to view</span>
-              </div>
-              {suggestions.map((p) => (
-                <Link
-                  key={p._id}
-                  to={`/product/${p.slug}`}
-                  onClick={() => setShowSuggestions(false)}
-                  className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-b-0"
-                >
-                  <img
-                    src={p.thumbnail || p.variants?.[0]?.images?.[0]}
-                    alt={p.title}
-                    className="w-9 h-9 rounded-lg object-cover bg-slate-100 shrink-0"
-                  />
-                  <div className="flex-1 min-w-0 text-left">
-                    <p className="text-xs font-bold text-slate-900 truncate">{p.title}</p>
-                    <p className="text-[11px] text-[#e11938] font-black">
-                      ₹{p.discountedPrice || p.variants?.[0]?.sellingPrice}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 
@@ -573,6 +502,12 @@ export const Navbar = () => {
           </div>
         </div>
       )}
+
+      {/* boAt-Style Full Search Modal / Overlay (Exact match to Image 3) */}
+      <SearchModal
+        isOpen={searchModalOpen}
+        onClose={() => setSearchModalOpen(false)}
+      />
     </header>
   );
 };
