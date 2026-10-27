@@ -412,35 +412,46 @@ export const Navbar = () => {
         <div className="lg:hidden border-t border-slate-200 bg-white px-4 py-5 space-y-4 shadow-xl">
           {/* Mobile User Profile Header */}
           {isAuthenticated ? (
-            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-2.5 min-w-0">
-                {user?.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt={user.name}
-                    referrerPolicy="no-referrer"
-                    className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-200 shrink-0"
-                  />
-                ) : (
-                  <div className="w-9 h-9 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center shrink-0">
-                    {user?.name ? user.name.charAt(0).toUpperCase() : <UserIcon className="w-4 h-4" />}
+            <div className="space-y-2">
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  {user?.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user.name}
+                      referrerPolicy="no-referrer"
+                      className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-200 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center shrink-0">
+                      {user?.name ? user.name.charAt(0).toUpperCase() : <UserIcon className="w-4 h-4" />}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-slate-900 truncate">{user?.name}</p>
+                    <p className="text-[10px] text-slate-500 truncate">{user?.email}</p>
                   </div>
-                )}
-                <div className="min-w-0">
-                  <p className="text-xs font-bold text-slate-900 truncate">{user?.name}</p>
-                  <p className="text-[10px] text-slate-500 truncate">{user?.email}</p>
                 </div>
+                <button
+                  onClick={() => {
+                    logout();
+                    setMobileMenuOpen(false);
+                    navigate('/');
+                  }}
+                  className="px-3 py-1.5 text-[11px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition shrink-0 cursor-pointer"
+                >
+                  Logout
+                </button>
               </div>
-              <button
-                onClick={() => {
-                  logout();
-                  setMobileMenuOpen(false);
-                  navigate('/');
-                }}
-                className="px-3 py-1.5 text-[11px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition shrink-0 cursor-pointer"
-              >
-                Logout
-              </button>
+              {user?.role === 'admin' && (
+                <Link
+                  to="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-[#e11938] hover:bg-[#be123c] text-white text-xs font-bold rounded-xl shadow-xs transition"
+                >
+                  <Shield className="w-4 h-4" /> Go to Admin Console
+                </Link>
+              )}
             </div>
           ) : (
             <button

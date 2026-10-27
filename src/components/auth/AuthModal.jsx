@@ -58,7 +58,22 @@ export const AuthModal = () => {
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       if (credentialResponse?.credential) {
-        await googleLogin(credentialResponse.credential);
+        const loggedUser = await googleLogin(credentialResponse.credential);
+        const searchParams = new URLSearchParams(location.search);
+        const redirectUrl = searchParams.get('redirect');
+
+        if (redirectUrl) {
+          closeAuthModal();
+          navigate(redirectUrl, { replace: true });
+          return;
+        }
+
+        if (loggedUser?.role === 'admin') {
+          closeAuthModal();
+          navigate('/admin', { replace: true });
+          return;
+        }
+
         handleClose();
       }
     } catch (err) {
@@ -73,11 +88,28 @@ export const AuthModal = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      let loggedUser;
       if (isRegister) {
-        await register(formData);
+        loggedUser = await register(formData);
       } else {
-        await login(formData.email, formData.password);
+        loggedUser = await login(formData.email, formData.password);
       }
+
+      const searchParams = new URLSearchParams(location.search);
+      const redirectUrl = searchParams.get('redirect');
+
+      if (redirectUrl) {
+        closeAuthModal();
+        navigate(redirectUrl, { replace: true });
+        return;
+      }
+
+      if (loggedUser?.role === 'admin') {
+        closeAuthModal();
+        navigate('/admin', { replace: true });
+        return;
+      }
+
       handleClose();
     } catch (err) {
       console.error('Auth Error:', err);
