@@ -435,7 +435,7 @@ export const ProductDetail = () => {
               </div>
               <div className="py-1.5 px-2 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center gap-1.5">
                 <RotateCcw className="w-3.5 h-3.5 text-[#e11938] shrink-0" />
-                <span className="font-semibold">7 Days Return</span>
+                <span className="font-semibold">7 Days Replacement</span>
               </div>
             </div>
 

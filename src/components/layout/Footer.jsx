@@ -117,7 +117,7 @@ export const Footer = () => {
             <ul className="space-y-2.5">
               <li><Link to="/track" className="hover:text-brand-red transition-colors">Track Your Order</Link></li>
               <li><Link to="/shop" className="hover:text-brand-red transition-colors">Warranty Claim</Link></li>
-              <li><Link to="/shop" className="hover:text-brand-red transition-colors">Shipping & Returns</Link></li>
+              <li><Link to="/shop" className="hover:text-brand-red transition-colors">Shipping & Replacement Policy</Link></li>
               <li><Link to="/shop" className="hover:text-brand-red transition-colors">Privacy Policy</Link></li>
               <li><Link to="/shop" className="hover:text-brand-red transition-colors">Prepaid Terms</Link></li>
             </ul>
