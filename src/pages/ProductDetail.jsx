@@ -426,9 +426,9 @@ export const ProductDetail = () => {
             <button
               onClick={handleBuyNow}
               disabled={stockQuantity <= 0}
-              className="w-full py-4 bg-brand-red hover:bg-brand-red-hover text-white rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md transition-all"
+              className="w-full py-4 bg-brand-red hover:bg-brand-red-hover text-white rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
             >
-              <Zap className="w-4 h-4" /> Instant Buy Now
+              <Zap className="w-4 h-4" /> Buy Now
             </button>
           </div>
 
