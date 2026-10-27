@@ -212,29 +212,29 @@ export const AuthModal = () => {
               </button>
             </div>
 
-            {/* Bottom Disclaimer with Shield */}
-            <div className="mt-8 pt-4 border-t border-slate-100 flex items-start gap-2.5 text-[11px] text-slate-500">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-              <div className="flex flex-col leading-tight">
+            {/* Bottom Disclaimer with Shield (Centered) */}
+            <div className="mt-8 pt-4 border-t border-slate-100 flex flex-col items-center justify-center text-center text-[11px] text-slate-500">
+              <div className="flex items-center justify-center gap-1.5 mb-0.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span>By continuing, you agree to our</span>
-                <span className="mt-0.5">
-                  <Link
-                    to="/terms"
-                    onClick={handleClose}
-                    className="text-slate-900 font-bold underline underline-offset-2 hover:text-[#e11938]"
-                  >
-                    Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link
-                    to="/privacy"
-                    onClick={handleClose}
-                    className="text-slate-900 font-bold underline underline-offset-2 hover:text-[#e11938]"
-                  >
-                    Privacy Policy
-                  </Link>
-                  .
-                </span>
+              </div>
+              <div>
+                <Link
+                  to="/terms"
+                  onClick={handleClose}
+                  className="text-slate-900 font-bold underline underline-offset-2 hover:text-[#e11938]"
+                >
+                  Terms of Service
+                </Link>{' '}
+                and{' '}
+                <Link
+                  to="/privacy"
+                  onClick={handleClose}
+                  className="text-slate-900 font-bold underline underline-offset-2 hover:text-[#e11938]"
+                >
+                  Privacy Policy
+                </Link>
+                .
               </div>
             </div>
           </div>
