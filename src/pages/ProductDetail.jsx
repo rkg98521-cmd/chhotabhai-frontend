@@ -52,16 +52,41 @@ export const ProductDetail = () => {
           setSelectedDevice(p.supportedDevices[0]);
         }
 
-        // Fetch similar / related products
+        // Fetch similar / related products - ensure full 4-card row
         try {
-          const relRes = await axiosInstance.get('/products', {
-            params: { limit: 8, category: p.category?.slug || undefined },
-          });
-          const allItems = relRes.data?.data?.products || relRes.data?.products || [];
-          const filtered = allItems
-            .filter((item) => (item.slug || item._id) !== slug)
-            .slice(0, 4);
-          setRelatedProducts(filtered);
+          let items = [];
+          if (p.category?.slug) {
+            try {
+              const relRes = await axiosInstance.get('/products', {
+                params: { limit: 12, category: p.category.slug },
+              });
+              items = (relRes.data?.data?.products || relRes.data?.products || []).filter(
+                (item) => (item.slug || item._id) !== slug && (item._id || item.id) !== (p._id || p.id)
+              );
+            } catch (err) {
+              console.error(err);
+            }
+          }
+
+          // Backfill with other popular accessories so the entire 4-column row is full
+          if (items.length < 4) {
+            try {
+              const allRes = await axiosInstance.get('/products', {
+                params: { limit: 16 },
+              });
+              const more = (allRes.data?.data?.products || allRes.data?.products || []).filter(
+                (item) =>
+                  (item.slug || item._id) !== slug &&
+                  (item._id || item.id) !== (p._id || p.id) &&
+                  !items.some((x) => (x._id || x.id) === (item._id || item.id))
+              );
+              items = [...items, ...more];
+            } catch (err) {
+              console.error(err);
+            }
+          }
+
+          setRelatedProducts(items.slice(0, 4));
         } catch (relErr) {
           console.error('Related products fetch error:', relErr);
         }
