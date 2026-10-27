@@ -112,12 +112,12 @@ export const AuthModal = () => {
           <X className="w-4 h-4" />
         </button>
 
-        {/* ChhotaBhai Brand Name (Clean, Premium, No Icon) */}
+        {/* Welcome to ChhotaBhai Header */}
         <div className="pt-2">
-          <span className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 font-sans select-none">
-            Chhota<span className="text-[#e11938]">Bhai</span>
-          </span>
-          <p className="text-xs text-slate-500 font-medium mt-1">
+          <h2 className="text-2xl sm:text-[28px] font-black tracking-tight text-slate-900 font-sans select-none">
+            Welcome to Chhota<span className="text-[#e11938]">Bhai</span>
+          </h2>
+          <p className="text-xs text-slate-500 font-medium mt-1.5">
             Sign in to continue
           </p>
         </div>
