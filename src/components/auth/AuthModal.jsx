@@ -150,21 +150,21 @@ export const AuthModal = () => {
               </p>
             </div>
 
-            {/* Action Buttons: Google + Email with separator and arrows */}
-            <div className="mt-7 sm:mt-8 space-y-3">
+            {/* Action Buttons: Google + Email with separator and arrows (Bigger height & font) */}
+            <div className="mt-7 sm:mt-8 space-y-3.5">
               {/* 1. Continue with Google */}
-              <div className="relative w-full h-13 rounded-full bg-white hover:bg-slate-50 border border-slate-300/90 shadow-2xs hover:shadow-xs flex items-center justify-between px-4 transition active:scale-[0.99] cursor-pointer overflow-hidden group">
+              <div className="relative w-full h-14 sm:h-15 rounded-full bg-white hover:bg-slate-50 border border-slate-300 shadow-xs hover:shadow-sm flex items-center justify-between px-5 sm:px-6 transition active:scale-[0.99] cursor-pointer overflow-hidden group">
                 <div className="absolute inset-0 opacity-0 z-20 flex items-center justify-center overflow-hidden cursor-pointer scale-125">
                   <GoogleLogin
                     onSuccess={handleGoogleSuccess}
                     onError={handleGoogleError}
                     shape="pill"
                     size="large"
-                    width="380"
+                    width="400"
                   />
                 </div>
 
-                <div className="flex items-center gap-3 relative z-10">
+                <div className="flex items-center gap-3.5 relative z-10">
                   <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                     <path
                       fill="#4285F4"
@@ -183,32 +183,32 @@ export const AuthModal = () => {
                       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                     />
                   </svg>
-                  <span className="h-4 w-px bg-slate-200" />
-                  <span className="text-slate-800 text-sm font-bold tracking-wide">
+                  <span className="h-5 w-px bg-slate-200" />
+                  <span className="text-slate-800 text-sm sm:text-[15px] font-bold tracking-wide">
                     Continue with Google
                   </span>
                 </div>
 
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-900 group-hover:translate-x-0.5 transition-all relative z-10" />
+                <ArrowRight className="w-4.5 h-4.5 text-slate-400 group-hover:text-slate-900 group-hover:translate-x-1 transition-all relative z-10" />
               </div>
 
               {/* 2. Continue with email */}
               <button
                 type="button"
                 onClick={() => setMode('email')}
-                className="w-full h-13 rounded-full bg-slate-900 hover:bg-black text-white shadow-xs hover:shadow-sm flex items-center justify-between px-4 transition active:scale-[0.99] cursor-pointer group"
+                className="w-full h-14 sm:h-15 rounded-full bg-slate-900 hover:bg-black text-white shadow-xs hover:shadow-sm flex items-center justify-between px-5 sm:px-6 transition active:scale-[0.99] cursor-pointer group"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3.5">
                   <div className="w-5 h-5 flex items-center justify-center">
-                    <Mail className="w-4 h-4 text-white/90" />
+                    <Mail className="w-5 h-5 text-white/90" />
                   </div>
-                  <span className="h-4 w-px bg-white/20" />
-                  <span className="text-white text-sm font-bold tracking-wide">
+                  <span className="h-5 w-px bg-white/20" />
+                  <span className="text-white text-sm sm:text-[15px] font-bold tracking-wide">
                     Continue with email
                   </span>
                 </div>
 
-                <ArrowRight className="w-4 h-4 text-white/70 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                <ArrowRight className="w-4.5 h-4.5 text-white/70 group-hover:text-white group-hover:translate-x-1 transition-all" />
               </button>
             </div>
 
